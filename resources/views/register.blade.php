@@ -59,7 +59,7 @@
             </div>
             <div class="mb-3">
                 <label for="nohpcp" class="form-label">Nomor Hp</label>
-                <input type="text" value="{{ old('nohpcp') }}" name="no_telp" class="form-control">
+                <input type="text" value="{{ old('nohpcp') }}" name="nohpcp" class="form-control">
             </div>
             <div class="mb-3">
                 <label for="jabatancp" class="form-label">Jabatan</label>
