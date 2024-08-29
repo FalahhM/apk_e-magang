@@ -10,7 +10,8 @@ class AdminController extends Controller
     function index(){
         return view ('admin');
     }
+    
     function kampus(){
-        return view ('admin');
+        return view ('formkampus/kampus');
     }
 }
