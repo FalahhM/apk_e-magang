@@ -34,3 +34,5 @@ Route::get('/register',[SesiController::class,'formregister'])->name('register')
 Route::post('/register',[SesiController::class,'register']);
 
 Route::get('/kampus',[MagangController::class,'nampil'])->middleware('auth');
+Route::resource('mahasiswas', MagangController::class);
+Route::get('/datatabel', [MagangController::class, 'datatabel'])->name('datatabel');
