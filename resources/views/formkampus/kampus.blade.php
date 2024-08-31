@@ -10,9 +10,10 @@
 </head>
 <body>
     <div class="container mt-5">
+        <div class="d-flex justify-content-end"><a href="{{ url('/logout') }}" class="btn btn-sm btn-secondary">Logout >></a></div>
         <h2 class="mb-4 text-center">Form Pengajuan Magang</h2>
-        <div><a href="/logout" class="btn btn-sm btn-secondary">Logout >></a></div>
-        <form action="{{ route('mahasiswas.store') }}" method="POST">
+        <h4 class="mb-3">Data Kampus</h4>
+        <form action="{{ url('/mahasiswa') }}" method="POST">
             @csrf
             <!-- Asal Kampus -->
             <div class="form-group">
@@ -35,8 +36,8 @@
                 <textarea class="form-control" id="alamatKampus" rows="3" readonly>{{ $user->alamat }}</textarea>
             </div>
             <!-- Contact Person -->
-            <h5>Contact Person</h5>
-            <div class="ml-5">
+            <h4 class="mt-5 mb-3">Contact Person</h4>
+            <div>
                 <div class="form-group">
                     <label for="namaCP">Nama Contact Person</label>
                     <input type="text" class="form-control" id="namaCP" value="{{ $contact_person->namecp }}" readonly>
@@ -54,20 +55,10 @@
                     <input type="text" class="form-control" id="jabatanCP" value="{{ $contact_person->jabatan }}" readonly>
                 </div>
             </div>
-            <!-- Mulai Tanggal -->
             <div class="form-group">
-                <label for="mulaiTanggal">Mulai Tanggal</label>
-                <input type="date" class="form-control" id="mulaiTanggal" name="mulai_tanggal">
-            </div>
-            <!-- Sampai Tanggal -->
-            <div class="form-group">
-                <label for="sampaiTanggal">Sampai Tanggal</label>
-                <input type="date" class="form-control" id="sampaiTanggal" name="sampai_tanggal">
-            </div>
-            <div class="form-group">
-                <label>Data Mahasiswa</label>
+                <h4 class="mt-5 mb-3">Data Mahasiswa</h4>
                 <!-- Button trigger modal -->
-                <button type="button" class="btn btn-info" data-toggle="modal" data-target="#studentModal">
+                <button type="button" class="btn btn-info mt-2" data-toggle="modal" data-target="#studentModal">
                     Input Data
                 </button>
             </div>
@@ -83,7 +74,7 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form action="{{ route('mahasiswas.store') }}" method="POST">
+                            <form action="{{ url('/mahasiswa') }}" method="POST">
                                 @csrf
                                 <div class="form-group">
                                     <label for="nama_mahasiswa">Nama Mahasiswa</label>
@@ -101,6 +92,16 @@
                                     <label for="dospem">Dospem</label>
                                     <input type="text" class="form-control" id="dospem" name="dospem" placeholder="Masukkan Nama Dospem">
                                 </div>
+                                <!-- Mulai Tanggal -->
+                                <div class="form-group">
+                                    <label for="mulaiTanggal">Mulai Tanggal</label>
+                                    <input type="date" class="form-control" id="mulaiTanggal" name="mulai_tanggal">
+                                </div>
+                                <!-- Sampai Tanggal -->
+                                <div class="form-group">
+                                    <label for="sampaiTanggal">Sampai Tanggal</label>
+                                    <input type="date" class="form-control" id="sampaiTanggal" name="sampai_tanggal">
+                                </div>
                                 <div class="modal-footer">
                                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                                     <button type="submit" class="btn btn-primary">Kirim</button>
@@ -110,7 +111,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <table class="table table-bordered table-hover">
                 <thead>
                     <tr>
@@ -119,26 +120,34 @@
                         <th>NIM</th>
                         <th>Jurusan</th>
                         <th>Dospem</th>
+                        <th>Mulai Tanggal</th>
+                        <th>Sampai Tanggal</th>
                         <th>Aksi</th>
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach($mahasiswas as $index => $mahasiswa)
+                    @forelse ($data_mahasiswa as $key => $mahasiswa)
                     <tr>
-                        <td>{{ $index + 1 }}</td>
+                        <td>{{ $key + 1 }}</td>
                         <td>{{ $mahasiswa->nama_mahasiswa }}</td>
                         <td>{{ $mahasiswa->nim }}</td>
                         <td>{{ $mahasiswa->jurusan }}</td>
                         <td>{{ $mahasiswa->dospem }}</td>
+                        <td>{{ $mahasiswa->mulai_tanggal }}</td>
+                        <td>{{ $mahasiswa->sampai_tanggal }}</td>
                         <td>
-                            <a href="#"><button class="btn btn-warning">Edit</button></a>
-                            <a href="#"><button class="btn btn-danger">Hapus</button></a>
+                            <a href=""></a>
+                            <a href=""></a>
                         </td>
                     </tr>
-                    @endforeach
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center">Data Mahasiswa Tidak Tersedia</td>
+                        </tr>
+                    @endforelse
                 </tbody>
             </table>
-            
+
             <!-- Submit Button -->
             <button type="submit" class="btn btn-primary">Ajukan</button>
         </form>
