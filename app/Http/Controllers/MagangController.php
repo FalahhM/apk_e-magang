@@ -29,7 +29,8 @@ class MagangController extends Controller
         return view('formkampus.formpengajuan', compact('user', 'data_mahasiswa'));
     }
 
-    public function storeMahasiswa(Request $request){
+    public function storeMahasiswa(Request $request)
+    {
         $validatedData = $request->validate([
             'nama_mahasiswa' => 'required|string|max:255',
             'nim' => 'required|string|max:50',
@@ -37,11 +38,22 @@ class MagangController extends Controller
             'dospem' => 'required|string|max:255',
             'mulai_tanggal' => 'nullable|date',
             'sampai_tanggal' => 'nullable|date',
+            'dokumen' => 'nullable|file|mimes:pdf|max:2048',
         ]);
+
+        if ($request->hasFile('dokumen')) {
+            $file = $request->file('dokumen');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads'), $filename); 
+            $validatedData['dokumen'] = $filename; 
+        }
+
         $validatedData['user_id'] = Auth::id();
         MahasiswaModel::create($validatedData);
+
         return redirect()->back()->with('success', 'Data mahasiswa berhasil disimpan.');
     }
+
     
     public function updateMahasiswa(Request $request, $id)
     {
