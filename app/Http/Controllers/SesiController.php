@@ -16,7 +16,7 @@ class SesiController extends Controller
 
     function login(Request $request){
         $request->validate([
-            'email'=>'required',
+            'email'=>'required','',
             'password'=>'required'
         ],[
             'email.required'=>'Email wajib diisi',
@@ -32,7 +32,7 @@ class SesiController extends Controller
             if(Auth::user()->role == 'admin'){
                 return redirect('/admin');
             } elseif(Auth::user()->role == 'kampus'){
-                return redirect('/kampus');
+                return redirect('/tampilanawal');
             }
         } else {
             return redirect('')->withErrors('Email dan password yang dimasukkan tidak sesuai')->withInput();
