@@ -5,7 +5,6 @@
 
   <h4 class="mb-3">Form Pengajuan Magang</h4>
 
-  <form>
     <div class="form-group">
       <label for="no_surat">No. Surat</label>
       <input type="text" class="form-control" id="no_surat" placeholder="Isi Nomor Surat">
@@ -36,49 +35,49 @@
 
     <!-- Student Input Modal -->
     <div class="modal fade" id="studentModal" tabindex="-1" role="dialog" aria-labelledby="studentModalLabel" aria-hidden="true">
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="studentModalLabel">Input Data Mahasiswa</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form action="{{ url('/mahasiswa') }}" method="POST">
-              @csrf
-              <div class="form-group">
-                <label for="nama_mahasiswa">Nama Mahasiswa</label>
-                <input type="text" class="form-control" id="nama_mahasiswa" name="nama_mahasiswa" placeholder="Masukkan Nama Mahasiswa">
-              </div>
-              <div class="form-group">
-                <label for="nim">NIM</label>
-                <input type="text" class="form-control" id="nim" name="nim" placeholder="Masukkan NIM">
-              </div>
-              <div class="form-group">
-                <label for="jurusan">Jurusan</label>
-                <input type="text" class="form-control" id="jurusan" name="jurusan" placeholder="Masukkan Jurusan">
-              </div>
-              <div class="form-group">
-                <label for="dospem">Dospem</label>
-                <input type="text" class="form-control" id="dospem" name="dospem" placeholder="Masukkan Nama Dospem">
-              </div>
-              <div class="form-group">
-                <label for="mulaiTanggal">Mulai Tanggal</label>
-                <input type="date" class="form-control" id="mulaiTanggal" name="mulai_tanggal">
-              </div>
-              <div class="form-group">
-                <label for="sampaiTanggal">Sampai Tanggal</label>
-                <input type="date" class="form-control" id="sampaiTanggal" name="sampai_tanggal">
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="submit" class="btn btn-primary">Kirim</button>
-              </div>
-            </form>
-          </div>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="studentModalLabel">Input Data Mahasiswa</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form action="{{ url('/mahasiswa') }}" method="POST">
+                        @csrf
+                        <div class="form-group">
+                            <label for="nama_mahasiswa">Nama Mahasiswa</label>
+                            <input type="text" class="form-control" id="nama_mahasiswa" name="nama_mahasiswa" placeholder="Masukkan Nama Mahasiswa" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nim">NIM</label>
+                            <input type="text" class="form-control" id="nim" name="nim" placeholder="Masukkan NIM" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="jurusan">Jurusan</label>
+                            <input type="text" class="form-control" id="jurusan" name="jurusan" placeholder="Masukkan Jurusan" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="dospem">Dospem</label>
+                            <input type="text" class="form-control" id="dospem" name="dospem" placeholder="Masukkan Nama Dospem" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mulaiTanggal">Mulai Tanggal</label>
+                            <input type="date" class="form-control" id="mulaiTanggal" name="mulai_tanggal">
+                        </div>
+                        <div class="form-group">
+                            <label for="sampaiTanggal">Sampai Tanggal</label>
+                            <input type="date" class="form-control" id="sampaiTanggal" name="sampai_tanggal">
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Kirim</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
 
     <!-- Table for Students Data -->
@@ -175,6 +174,5 @@
     <div class="d-flex justify-content-end mt-4">
         <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
     </div>
-  </form>
 </div>
   @endsection

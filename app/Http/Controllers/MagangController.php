@@ -30,29 +30,23 @@ class MagangController extends Controller
     }
 
     public function storeMahasiswa(Request $request)
-    {
-        $validatedData = $request->validate([
-            'nama_mahasiswa' => 'required|string|max:255',
-            'nim' => 'required|string|max:50',
-            'jurusan' => 'required|string|max:255',
-            'dospem' => 'required|string|max:255',
-            'mulai_tanggal' => 'nullable|date',
-            'sampai_tanggal' => 'nullable|date',
-            'dokumen' => 'nullable|file|mimes:pdf|max:2048',
-        ]);
+{
+    $validatedData = $request->validate([
+        'nama_mahasiswa' => 'required|string|max:255',
+        'nim' => 'required|string|max:50',
+        'jurusan' => 'required|string|max:255',
+        'dospem' => 'required|string|max:255',
+        'mulai_tanggal' => 'nullable|date',
+        'sampai_tanggal' => 'nullable|date',
+    ]);
 
-        if ($request->hasFile('dokumen')) {
-            $file = $request->file('dokumen');
-            $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads'), $filename); 
-            $validatedData['dokumen'] = $filename; 
-        }
+    $validatedData['user_id'] = Auth::id();
+    
+    MahasiswaModel::create($validatedData);
 
-        $validatedData['user_id'] = Auth::id();
-        MahasiswaModel::create($validatedData);
+    return redirect()->back()->with('success', 'Data mahasiswa berhasil disimpan.');
+}
 
-        return redirect()->back()->with('success', 'Data mahasiswa berhasil disimpan.');
-    }
 
     
     public function updateMahasiswa(Request $request, $id)

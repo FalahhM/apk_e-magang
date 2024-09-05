@@ -11,7 +11,7 @@ class AdminController extends Controller
         return view ('admin');
     }
     
-    function kampus(){
-        return view ('formkampus/kampus');
+    public function pengajuan(){
+        return view ('menuadmin/pengajuanmagang');
     }
 }

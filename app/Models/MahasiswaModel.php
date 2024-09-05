@@ -16,7 +16,6 @@ class MahasiswaModel extends Model
         'dospem',
         'mulai_tanggal',
         'sampai_tanggal',
-        'dokumen',
         'user_id',
     ];
 }

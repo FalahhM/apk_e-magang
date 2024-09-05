@@ -16,7 +16,7 @@ Route::get('/home',function(){
 
 Route::middleware(['auth'])->group(function(){
     Route::get('/admin',[AdminController::class,'index'])->middleware('userAkses:admin');
-    Route::get('/kampus',[AdminController::class,'kampus'])->middleware('userAkses:kampus');
+    Route::get('/pengajuanmagang',[AdminController::class,'pengajuan'])->middleware('userAkses:admin');
     Route::post('/logout',[SesiController::class,'logout']);
 });
 

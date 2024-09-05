@@ -5,16 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class ContactPerson extends Model
+class PengajuanModel extends Model
 {
     use HasFactory;
-    protected $table = 'contact_person';
+    protected $table = 'pengajuans';
 
     protected $fillable = [
-        'namecp',
-        'emailcp',
-        'nohpcp',
-        'jabatan',
+        'no_surat',
+        'perihal',
+        'tanggal_surat',
+        'dokumen',
         'user_id',
     ];
 }
