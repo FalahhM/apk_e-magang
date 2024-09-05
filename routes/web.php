@@ -25,7 +25,7 @@ Route::post('/register',[SesiController::class,'register']);
     
 Route::get('/kampus', [MagangController::class, 'nampil'])->middleware('auth');
 Route::get('/formpengajuan', [MagangController::class, 'pengajuan'])->middleware('auth');
-Route::post('/mahasiswa', [MagangController::class, 'storeMahasiswa'])->middleware('auth');
+Route::post('/mahasiswa', [MagangController::class, 'storeMahasiswa'])->name('storeMahasiswa')->middleware('auth');
 Route::get('/mahasiswa/{id}/edit', [MagangController::class, 'editMahasiswa'])->middleware('auth');
 Route::put('/mahasiswa/{id}', [MagangController::class, 'updateMahasiswa'])->middleware('auth');
 Route::delete('hapusMahasiswa/{id}',[MagangController::class,'hapusMahasiswa'])->middleware('auth')->name('hapusMahasiswa');
@@ -33,3 +33,5 @@ Route::delete('hapusMahasiswa/{id}',[MagangController::class,'hapusMahasiswa'])-
 Route::middleware(['auth'])->group(function() {
     Route::get('/tampilanawal', [DashboardController::class, 'index'])->name('tampilanawal');
 });
+
+
