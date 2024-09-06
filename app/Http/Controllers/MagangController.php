@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ContactPerson;
 use App\Models\MahasiswaModel;
+use App\Models\PengajuanModel;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -47,6 +48,27 @@ class MagangController extends Controller
     return redirect()->back()->with('success', 'Data mahasiswa berhasil disimpan.');
 }
 
+    public function storePengajuan(Request $request)
+{
+    $validatedData = $request->validate([
+        'no_surat' => 'required|string|max:255',
+        'tanggal_surat' => 'required|date',
+        'perihal' => 'required|string|max:255',
+        'dokumen' => 'nullable|file|mimes:pdf',
+    ]);
+
+    $validatedData['user_id'] = Auth::id();
+
+    if ($request->hasFile('dokumen')) {
+        $file = $request->file('dokumen');
+        $filename = time() . '_' . $file->getClientOriginalName();
+        $file->move(public_path('uploads'), $filename);
+        $validatedData['dokumen'] = $filename;
+    }
+
+    PengajuanModel::create($validatedData);
+    return redirect()->back()->with('success', 'Pengajuan magang berhasil dikirim.');
+}
 
     
     public function updateMahasiswa(Request $request, $id)

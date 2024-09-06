@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PengajuanModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,6 +13,11 @@ class AdminController extends Controller
     }
     
     public function pengajuan(){
-        return view ('menuadmin/pengajuanmagang');
+        return $this->tampilPengajuan();
+    }
+
+    public function tampilPengajuan(){
+        $data_pengajuan = PengajuanModel::with('user')->get();
+        return view('menuadmin.pengajuanmagang',compact('data_pengajuan'));
     }
 }

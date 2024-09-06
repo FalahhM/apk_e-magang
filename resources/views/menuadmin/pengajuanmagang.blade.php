@@ -19,17 +19,23 @@
                                             <th>Aksi</th>
                                         </tr>
                                     </thead>
+                                    @if($data_pengajuan->isNotEmpty())
                                     <tbody>
+                                        @foreach ($data_pengajuan as $key => $pengajuan)
                                         <tr>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
-                                            <td></td>
+                                            <td>{{ $key + 1 }}</td>
+                                            <td>{{ $pengajuan->no_surat }}</td>
+                                            <td>{{ $pengajuan->user->name }}</td>
+                                            <td>{{ $pengajuan->tanggal_surat }}</td>
+                                            <td>{{ $pengajuan->perihal }}</td>
+                                            <td>{{ $pengajuan->status ?? 'Belum diproses' }}</td>
                                             <td><button class="btn btn-info btn-sm">Detail</button></td>
                                         </tr>
+                                        @endforeach
                                     </tbody>
+                                    @else
+                                        <p>Data pengajuan tidak tersedia.</p>
+                                    @endif
                                 </table>
                             </div>
                         </div>

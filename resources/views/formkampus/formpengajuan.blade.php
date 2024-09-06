@@ -1,7 +1,7 @@
 @extends('template.header')
 @section('content')
 
-<form action="" method="POST" enctype="multipart/form-data">
+<form action="{{ route('storePengajuan') }}" method="POST" enctype="multipart/form-data" id="formPengajuan">
     @csrf
     <div class="container">
         <h4 class="mb-3">Form Pengajuan Magang</h4>
@@ -60,11 +60,7 @@
                         <td>{{ $mahasiswa->sampai_tanggal }}</td>
                         <td>
                             <button type="button" class="btn btn-warning editButton" data-id="{{ $mahasiswa->id }}" data-toggle="modal" data-target="#editModal">E</button>
-                            <form action="{{ route('hapusMahasiswa', $mahasiswa->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah Anda yakin ingin menghapus data mahasiswa ini?')">H</button>
-                            </form>
+                            <button type="button" class="btn btn-danger" onclick="hapusMahasiswa('{{ route('hapusMahasiswa', $mahasiswa->id) }}')">H</button>
                         </td>
                     </tr>
                 @empty
@@ -176,22 +172,33 @@
 </div>
 
 <script>
-    $(document).ready(function() {
-        // Setting up edit modal form action dynamically
-        $('.editButton').on('click', function() {
-            let id = $(this).data('id');
-            $.get('/path/to/get/mahasiswa/' + id, function(data) {
-                $('#editForm').attr('action', '/path/to/update/mahasiswa/' + id);
-                $('#editId').val(data.id);
-                $('#edit_nama_mahasiswa').val(data.nama_mahasiswa);
-                $('#edit_nim').val(data.nim);
-                $('#edit_jurusan').val(data.jurusan);
-                $('#edit_dospem').val(data.dospem);
-                $('#edit_mulaiTanggal').val(data.mulai_tanggal);
-                $('#edit_sampaiTanggal').val(data.sampai_tanggal);
-            });
-        });
+function hapusMahasiswa(url) {
+    if (confirm('Apakah Anda yakin ingin menghapus data mahasiswa ini?')) {
+        const form = document.createElement('form');
+        form.action = url; // Pastikan ini mengarah ke route hapusMahasiswa
+        form.method = 'POST';
+        form.innerHTML = `
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="_method" value="DELETE">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+$('.editButton').on('click', function() {
+    let id = $(this).data('id');
+    $.get('/path/to/get/mahasiswa/' + id, function(data) {
+        $('#editForm').attr('action', '/path/to/update/mahasiswa/' + id);
+        $('#editId').val(data.id);
+        $('#edit_nama_mahasiswa').val(data.nama_mahasiswa);
+        $('#edit_nim').val(data.nim);
+        $('#edit_jurusan').val(data.jurusan);
+        $('#edit_dospem').val(data.dospem);
+        $('#edit_mulaiTanggal').val(data.mulai_tanggal);
+        $('#edit_sampaiTanggal').val(data.sampai_tanggal);
     });
+});
 </script>
 
 @endsection

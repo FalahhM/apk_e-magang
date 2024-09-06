@@ -9,12 +9,10 @@ class PengajuanModel extends Model
 {
     use HasFactory;
     protected $table = 'pengajuans';
+    protected $fillable = ['no_surat', 'tanggal_surat', 'perihal', 'dokumen', 'user_id'];
 
-    protected $fillable = [
-        'no_surat',
-        'perihal',
-        'tanggal_surat',
-        'dokumen',
-        'user_id',
-    ];
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

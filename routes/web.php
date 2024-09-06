@@ -6,32 +6,39 @@ use App\Http\Controllers\MagangController;
 use App\Http\Controllers\SesiController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['guest'])->group(function(){
-    Route::get('/',[SesiController::class,'index'])->name('login');
-    Route::post('/',[SesiController::class,'login']);
+// Rute untuk Guest
+Route::middleware(['guest'])->group(function() {
+    Route::get('/', [SesiController::class, 'index'])->name('login');
+    Route::post('/', [SesiController::class, 'login']);
 });
-Route::get('/home',function(){
+
+// Rute untuk Redirect Home
+Route::get('/home', function() {
     return redirect('/admin');
 });
 
-Route::middleware(['auth'])->group(function(){
-    Route::get('/admin',[AdminController::class,'index'])->middleware('userAkses:admin');
-    Route::get('/pengajuanmagang',[AdminController::class,'pengajuan'])->middleware('userAkses:admin');
-    Route::post('/logout',[SesiController::class,'logout']);
+// Rute untuk Authenticated User dengan akses admin
+Route::middleware(['auth', 'userAkses:admin'])->group(function() {
+    Route::get('/admin', [AdminController::class, 'index']);
+    Route::get('/pengajuanmagang', [AdminController::class, 'pengajuan']);
+    Route::get('/pengajuanmagang', [AdminController::class, 'tampilPengajuan'])->name('tampilPengajuan');
+    Route::post('/logout', [SesiController::class, 'logout']);
 });
 
-Route::get('/register',[SesiController::class,'formregister'])->name('register');
-Route::post('/register',[SesiController::class,'register']);
-    
-Route::get('/kampus', [MagangController::class, 'nampil'])->middleware('auth');
-Route::get('/formpengajuan', [MagangController::class, 'pengajuan'])->middleware('auth');
-Route::post('/mahasiswa', [MagangController::class, 'storeMahasiswa'])->name('storeMahasiswa')->middleware('auth');
-Route::get('/mahasiswa/{id}/edit', [MagangController::class, 'editMahasiswa'])->middleware('auth');
-Route::put('/mahasiswa/{id}', [MagangController::class, 'updateMahasiswa'])->middleware('auth');
-Route::delete('hapusMahasiswa/{id}',[MagangController::class,'hapusMahasiswa'])->middleware('auth')->name('hapusMahasiswa');
+// Rute untuk Registrasi
+Route::get('/register', [SesiController::class, 'formregister'])->name('register');
+Route::post('/register', [SesiController::class, 'register']);
 
+// Rute untuk Magang dengan middleware auth
 Route::middleware(['auth'])->group(function() {
+    Route::get('/kampus', [MagangController::class, 'nampil']);
+    Route::get('/formpengajuan', [MagangController::class, 'pengajuan']);
+    Route::post('/mahasiswa', [MagangController::class, 'storeMahasiswa'])->name('storeMahasiswa');
+    Route::get('/mahasiswa/{id}/edit', [MagangController::class, 'editMahasiswa']);
+    Route::put('/mahasiswa/{id}', [MagangController::class, 'updateMahasiswa']);
+    Route::delete('hapusMahasiswa/{id}', [MagangController::class, 'hapusMahasiswa'])->name('hapusMahasiswa');
     Route::get('/tampilanawal', [DashboardController::class, 'index'])->name('tampilanawal');
 });
 
-
+// Rute untuk Store Pengajuan
+Route::post('/storePengajuan', [MagangController::class, 'storePengajuan'])->name('storePengajuan');
