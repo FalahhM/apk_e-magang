@@ -22,7 +22,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'alamat',
         'no_telp',
-        'password',
+        'password', 
         'role'
     ];
 
@@ -44,4 +44,8 @@ class User extends Authenticatable implements MustVerifyEmail
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function contactPerson(){
+        return $this->hasOne(ContactPerson::class,'user_id','id');
+    }
 }

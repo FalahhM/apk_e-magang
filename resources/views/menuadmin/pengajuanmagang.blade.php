@@ -29,7 +29,7 @@
                                             <td>{{ $pengajuan->tanggal_surat }}</td>
                                             <td>{{ $pengajuan->perihal }}</td>
                                             <td>{{ $pengajuan->status ?? 'Belum diproses' }}</td>
-                                            <td><button class="btn btn-info btn-sm">Detail</button></td>
+                                            <td><a href="{{ route('detailpengajuan', ['id' => $pengajuan->id]) }}"><button class="btn btn-info btn-sm">Detail</button></a></td>
                                         </tr>
                                         @endforeach
                                     </tbody>

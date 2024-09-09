@@ -42,3 +42,6 @@ Route::middleware(['auth'])->group(function() {
 
 // Rute untuk Store Pengajuan
 Route::post('/storePengajuan', [MagangController::class, 'storePengajuan'])->name('storePengajuan');
+Route::get('/detailpengajuan{id}', [AdminController::class,'detailpengajuan'])->name('detailpengajuan');
+Route::post('/pengajuan{id}/terima', [AdminController::class,'terimapengajuan'])->name('pengajuan.terima');
+Route::post('/pengajuan{id}/tolak', [AdminController::class,'tolakpengajuan'])->name('pengajuan.tolak');
