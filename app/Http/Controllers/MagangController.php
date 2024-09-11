@@ -16,90 +16,58 @@ class MagangController extends Controller
         $userId = Auth::id();
         $user = User::find($userId);
         $contact_person = ContactPerson::where('user_id', $userId)->first();
-        $data_mahasiswa = MahasiswaModel::where('user_id', $userId)->get();
-
-        return view('formkampus.kampus', compact('user', 'contact_person','data_mahasiswa'));
+        
+        return view('formkampus.kampus', compact('user', 'contact_person'));
     }
 
     public function pengajuan()
     {
         $userId = Auth::id();
         $user = User::find($userId);
-        $data_mahasiswa = MahasiswaModel::where('user_id', $userId)->get();
 
-        return view('formkampus.formpengajuan', compact('user', 'data_mahasiswa'));
+        return view('formkampus.formpengajuan', compact('user'));
     }
-
-    public function storeMahasiswa(Request $request)
-{
-    $validatedData = $request->validate([
-        'nama_mahasiswa' => 'required|string|max:255',
-        'nim' => 'required|string|max:50',
-        'jurusan' => 'required|string|max:255',
-        'dospem' => 'required|string|max:255',
-        'mulai_tanggal' => 'nullable|date',
-        'sampai_tanggal' => 'nullable|date',
-    ]);
-
-    $validatedData['user_id'] = Auth::id();
-    
-    MahasiswaModel::create($validatedData);
-
-    return redirect()->back()->with('success', 'Data mahasiswa berhasil disimpan.');
-}
 
     public function storePengajuan(Request $request)
-{
-    $validatedData = $request->validate([
-        'no_surat' => 'required|string|max:255',
-        'tanggal_surat' => 'required|date',
-        'perihal' => 'required|string|max:255',
-        'dokumen' => 'nullable|file|mimes:pdf',
-    ]);
-
-    $validatedData['user_id'] = Auth::id();
-
-    if ($request->hasFile('dokumen')) {
-        $file = $request->file('dokumen');
-        $filename = time() . '_' . $file->getClientOriginalName();
-        $file->move(public_path('uploads'), $filename);
-        $validatedData['dokumen'] = $filename;
-    }
-
-    PengajuanModel::create($validatedData);
-    return redirect()->back()->with('success', 'Pengajuan magang berhasil dikirim.');
-}
-
-    
-    public function updateMahasiswa(Request $request, $id)
     {
         $validatedData = $request->validate([
-            'nama_mahasiswa' => 'required|string|max:255',
-            'nim' => 'required|string|max:50',
-            'jurusan' => 'required|string|max:255',
-            'dospem' => 'required|string|max:255',
-            'mulai_tanggal' => 'nullable|date',
-            'sampai_tanggal' => 'nullable|date',
+            'no_surat' => 'required|string|max:255',
+            'tanggal_surat' => 'required|date',
+            'perihal' => 'required|string|max:255',
+            'dokumen' => 'nullable|file|mimes:pdf',
+            'mahasiswa' => 'nullable|string', // ubah menjadi string karena data dikirim dalam bentuk JSON string
         ]);
 
-        $mahasiswa = MahasiswaModel::findOrFail($id);
-        $mahasiswa->update($validatedData);
+        $validatedData['user_id'] = Auth::id();
 
-        return redirect()->back()->with('success', 'Data mahasiswa berhasil diperbarui.');
-    }
-
-    public function editMahasiswa($id)
-    {
-        $mahasiswa = MahasiswaModel::findOrFail($id);
-        return response()->json($mahasiswa);
-    }
-
-    public function hapusMahasiswa($id){
-        $mahasiswa=MahasiswaModel::find($id);
-        if($mahasiswa){
-            $mahasiswa->delete();
-            return redirect()->back()->with('success', 'Data mahasiswa berhasil dihapus.');
+        // Simpan dokumen jika ada
+        if ($request->hasFile('dokumen')) {
+            $file = $request->file('dokumen');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads'), $filename);
+            $validatedData['dokumen'] = $filename;
         }
-        return redirect()->json($mahasiswa);
+
+        // Simpan data pengajuan
+        $pengajuan = PengajuanModel::create($validatedData);
+
+        // Simpan data mahasiswa jika ada
+        if ($request->filled('mahasiswa')) {
+            $mahasiswaList = json_decode($request->input('mahasiswa'), true);
+            foreach ($mahasiswaList as $mahasiswa) {
+                MahasiswaModel::create([
+                    'pengajuan_id' => $pengajuan->id,
+                    'nama_mahasiswa' => $mahasiswa['nama'],
+                    'nim' => $mahasiswa['nim'],
+                    'jurusan' => $mahasiswa['jurusan'],
+                    'dospem' => $mahasiswa['dospem'],
+                    'mulai_tanggal' => $mahasiswa['mulaiTanggal'],
+                    'sampai_tanggal' => $mahasiswa['sampaiTanggal']
+                ]);
+            }
+        }
+
+        return redirect()->route('tampilPengajuan')->with('success', 'Pengajuan berhasil disimpan!');
     }
 }
+

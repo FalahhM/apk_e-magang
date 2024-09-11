@@ -21,8 +21,8 @@ return new class extends Migration
             $table->string('dospem');
             $table->date('mulai_tanggal');
             $table->date('sampai_tanggal');
-            $table->unsignedBigInteger('user_id');
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->unsignedBigInteger('pengajuan_id');
+            $table->foreign('pengajuan_id')->references('id')->on('pengajuans')->onDelete('cascade');
             $table->timestamps();
         });
     }

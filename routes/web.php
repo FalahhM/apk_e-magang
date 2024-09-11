@@ -20,7 +20,6 @@ Route::get('/home', function() {
 // Rute untuk Authenticated User dengan akses admin
 Route::middleware(['auth', 'userAkses:admin'])->group(function() {
     Route::get('/admin', [AdminController::class, 'index']);
-    Route::get('/pengajuanmagang', [AdminController::class, 'pengajuan']);
     Route::get('/pengajuanmagang', [AdminController::class, 'tampilPengajuan'])->name('tampilPengajuan');
     Route::post('/logout', [SesiController::class, 'logout']);
 });
@@ -31,17 +30,14 @@ Route::post('/register', [SesiController::class, 'register']);
 
 // Rute untuk Magang dengan middleware auth
 Route::middleware(['auth'])->group(function() {
-    Route::get('/kampus', [MagangController::class, 'nampil']);
-    Route::get('/formpengajuan', [MagangController::class, 'pengajuan']);
-    Route::post('/mahasiswa', [MagangController::class, 'storeMahasiswa'])->name('storeMahasiswa');
-    Route::get('/mahasiswa/{id}/edit', [MagangController::class, 'editMahasiswa']);
-    Route::put('/mahasiswa/{id}', [MagangController::class, 'updateMahasiswa']);
-    Route::delete('hapusMahasiswa/{id}', [MagangController::class, 'hapusMahasiswa'])->name('hapusMahasiswa');
     Route::get('/tampilanawal', [DashboardController::class, 'index'])->name('tampilanawal');
 });
 
+Route::get('/kampus', [MagangController::class, 'nampil'])->middleware('auth');
+Route::get('/formpengajuan', [MagangController::class, 'pengajuan'])->name('formPengajuan');
+Route::post('/storepengajuan', [MagangController::class, 'storePengajuan'])->name('storePengajuan');
+
 // Rute untuk Store Pengajuan
-Route::post('/storePengajuan', [MagangController::class, 'storePengajuan'])->name('storePengajuan');
-Route::get('/detailpengajuan{id}', [AdminController::class,'detailpengajuan'])->name('detailpengajuan');
-Route::post('/pengajuan{id}/terima', [AdminController::class,'terimapengajuan'])->name('pengajuan.terima');
-Route::post('/pengajuan{id}/tolak', [AdminController::class,'tolakpengajuan'])->name('pengajuan.tolak');
+Route::get('/detailpengajuan{id}', [AdminController::class, 'detailpengajuan'])->name('detailpengajuan');
+Route::post('/pengajuan{id}/terima', [AdminController::class, 'terimapengajuan'])->name('pengajuan.terima');
+Route::post('/pengajuan{id}/tolak', [AdminController::class, 'tolakpengajuan'])->name('pengajuan.tolak');

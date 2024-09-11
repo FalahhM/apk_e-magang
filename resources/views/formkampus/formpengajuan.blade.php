@@ -8,24 +8,26 @@
 
         <div class="form-group">
             <label for="no_surat">No. Surat</label>
-            <input type="text" class="form-control" id="no_surat" name="no_surat" placeholder="Isi Nomor Surat">
+            <input type="text" class="form-control" id="no_surat" name="no_surat" placeholder="Isi Nomor Surat" required>
         </div>
 
         <div class="form-group">
             <label for="tanggal_surat">Tanggal Surat</label>
-            <input type="date" class="form-control" id="tanggal_surat" name="tanggal_surat">
+            <input type="date" class="form-control" id="tanggal_surat" name="tanggal_surat" required>
         </div>
 
         <div class="form-group">
             <label for="perihal">Perihal</label>
-            <input type="text" class="form-control" id="perihal" name="perihal" placeholder="Isi Perihal">
+            <input type="text" class="form-control" id="perihal" name="perihal" placeholder="Isi Perihal" required>
         </div>
 
         <div class="form-group mt-4">
             <label for="dokumen">Unggah Surat Permohonan</label>
-            <input type="file" class="form-control-file" id="dokumen" name="dokumen" accept="application/pdf" multiple>
+            <input type="file" class="form-control-file" id="dokumen" name="dokumen" accept="application/pdf">
             <small class="form-text text-muted">Format dokumen: PDF</small>
         </div>
+
+        <input type="hidden" id="mahasiswaInput" name="mahasiswa">
 
         <div class="form-group">
             <!-- Button trigger modal -->
@@ -48,26 +50,8 @@
                     <th>Aksi</th>
                 </tr>
             </thead>
-            <tbody>
-                @forelse ($data_mahasiswa as $key => $mahasiswa)
-                    <tr>
-                        <td>{{ $key + 1 }}</td>
-                        <td>{{ $mahasiswa->nama_mahasiswa }}</td>
-                        <td>{{ $mahasiswa->nim }}</td>
-                        <td>{{ $mahasiswa->jurusan }}</td>
-                        <td>{{ $mahasiswa->dospem }}</td>
-                        <td>{{ $mahasiswa->mulai_tanggal }}</td>
-                        <td>{{ $mahasiswa->sampai_tanggal }}</td>
-                        <td>
-                            <button type="button" class="btn btn-warning editButton" data-id="{{ $mahasiswa->id }}" data-toggle="modal" data-target="#editModal">E</button>
-                            <button type="button" class="btn btn-danger" onclick="hapusMahasiswa('{{ route('hapusMahasiswa', $mahasiswa->id) }}')">H</button>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="8" class="text-center">Data Mahasiswa Tidak Tersedia</td>
-                    </tr>
-                @endforelse
+            <tbody id="studentTableBody">
+                <!-- Data mahasiswa akan di-render di sini -->
             </tbody>
         </table>
 
@@ -79,7 +63,7 @@
 <div class="modal fade" id="studentModal" tabindex="-1" role="dialog" aria-labelledby="studentModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form action="{{ route('storeMahasiswa') }}" method="POST">
+            <form id="studentForm">
                 @csrf
                 <div class="modal-header">
                     <h5 class="modal-title" id="studentModalLabel">Input Data Mahasiswa</h5>
@@ -114,57 +98,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Kirim</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Modal -->
-<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form id="editForm" method="POST">
-                @csrf
-                @method('PUT')
-                <input type="hidden" id="editId" name="id">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Edit Mahasiswa</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="edit_nama_mahasiswa">Nama Mahasiswa</label>
-                        <input type="text" class="form-control" id="edit_nama_mahasiswa" name="nama_mahasiswa">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_nim">NIM</label>
-                        <input type="text" class="form-control" id="edit_nim" name="nim">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_jurusan">Jurusan</label>
-                        <input type="text" class="form-control" id="edit_jurusan" name="jurusan">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_dospem">Dospem</label>
-                        <input type="text" class="form-control" id="edit_dospem" name="dospem">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_mulaiTanggal">Mulai Tanggal</label>
-                        <input type="date" class="form-control" id="edit_mulaiTanggal" name="mulai_tanggal">
-                    </div>
-                    <div class="form-group">
-                        <label for="edit_sampaiTanggal">Sampai Tanggal</label>
-                        <input type="date" class="form-control" id="edit_sampaiTanggal" name="sampai_tanggal">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" id="saveStudent">Simpan</button>
                 </div>
             </form>
         </div>
@@ -172,32 +107,76 @@
 </div>
 
 <script>
-function hapusMahasiswa(url) {
-    if (confirm('Apakah Anda yakin ingin menghapus data mahasiswa ini?')) {
-        const form = document.createElement('form');
-        form.action = url; // Pastikan ini mengarah ke route hapusMahasiswa
-        form.method = 'POST';
-        form.innerHTML = `
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
-            <input type="hidden" name="_method" value="DELETE">
-        `;
-        document.body.appendChild(form);
-        form.submit();
-    }
-}
+document.addEventListener('DOMContentLoaded', function() {
+    let mahasiswaData = [];
 
-$('.editButton').on('click', function() {
-    let id = $(this).data('id');
-    $.get('/path/to/get/mahasiswa/' + id, function(data) {
-        $('#editForm').attr('action', '/path/to/update/mahasiswa/' + id);
-        $('#editId').val(data.id);
-        $('#edit_nama_mahasiswa').val(data.nama_mahasiswa);
-        $('#edit_nim').val(data.nim);
-        $('#edit_jurusan').val(data.jurusan);
-        $('#edit_dospem').val(data.dospem);
-        $('#edit_mulaiTanggal').val(data.mulai_tanggal);
-        $('#edit_sampaiTanggal').val(data.sampai_tanggal);
+    function renderTable() {
+        const tbody = document.getElementById('studentTableBody');
+        tbody.innerHTML = '';
+        mahasiswaData.forEach((mahasiswa, index) => {
+            let row = `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${mahasiswa.nama}</td>
+                    <td>${mahasiswa.nim}</td>
+                    <td>${mahasiswa.jurusan}</td>
+                    <td>${mahasiswa.dospem}</td>
+                    <td>${mahasiswa.mulaiTanggal}</td>
+                    <td>${mahasiswa.sampaiTanggal}</td>
+                    <td>
+                        <button type="button" class="btn btn-warning btn-sm" onclick="editMahasiswa(${index})">Edit</button>
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMahasiswa(${index})">Hapus</button>
+                    </td>
+                </tr>
+            `;
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
+
+        // Update hidden input with JSON string
+        document.getElementById('mahasiswaInput').value = JSON.stringify(mahasiswaData);
+    }
+
+    document.getElementById('saveStudent').addEventListener('click', function() {
+        const form = document.getElementById('studentForm');
+        const nama = form.querySelector('#nama_mahasiswa').value;
+        const nim = form.querySelector('#nim').value;
+        const jurusan = form.querySelector('#jurusan').value;
+        const dospem = form.querySelector('#dospem').value;
+        const mulaiTanggal = form.querySelector('#mulaiTanggal').value;
+        const sampaiTanggal = form.querySelector('#sampaiTanggal').value;
+
+        mahasiswaData.push({
+            nama: nama,
+            nim: nim,
+            jurusan: jurusan,
+            dospem: dospem,
+            mulaiTanggal: mulaiTanggal,
+            sampaiTanggal: sampaiTanggal
+        });
+
+        renderTable();
+        $('#studentModal').modal('hide');
+        form.reset();
     });
+
+    window.editMahasiswa = function(index) {
+        const mahasiswa = mahasiswaData[index];
+        document.getElementById('nama_mahasiswa').value = mahasiswa.nama;
+        document.getElementById('nim').value = mahasiswa.nim;
+        document.getElementById('jurusan').value = mahasiswa.jurusan;
+        document.getElementById('dospem').value = mahasiswa.dospem;
+        document.getElementById('mulaiTanggal').value = mahasiswa.mulaiTanggal;
+        document.getElementById('sampaiTanggal').value = mahasiswa.sampaiTanggal;
+
+        $('#studentModal').modal('show');
+        mahasiswaData.splice(index, 1);
+        renderTable();
+    };
+
+    window.removeMahasiswa = function(index) {
+        mahasiswaData.splice(index, 1);
+        renderTable();
+    };
 });
 </script>
 
