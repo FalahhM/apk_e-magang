@@ -22,7 +22,7 @@ class AdminController extends Controller
     }
 
     public function detailpengajuan($id){
-        $pengajuan = PengajuanModel::with('user.contactPerson')->findOrFail($id);
+        $pengajuan = PengajuanModel::with('user.contactPerson','mahasiswas')->findOrFail($id);
         return view('menuadmin.detailpengajuan', compact('pengajuan'));
     }
 

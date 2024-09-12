@@ -54,6 +54,37 @@
         </div>
       </div>
 
+      <!-- Tabel Data Mahasiswa -->
+      <div class="row mb-3">
+        <div class="col-md-12">
+          <h5>Data Mahasiswa</h5>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>No</th>
+                <th>Nama Mahasiswa</th>
+                <th>NIM</th>
+                <th>Jurusan</th>
+                <th>Dosen Pembimbing</th>
+                <th>Periode</th>
+              </tr>
+            </thead>
+            <tbody>
+              @foreach ($pengajuan->mahasiswas as $index => $mahasiswa)
+                <tr>
+                  <td>{{ $index + 1 }}</td>
+                  <td>{{ $mahasiswa->nama_mahasiswa }}</td>
+                  <td>{{ $mahasiswa->nim }}</td>
+                  <td>{{ $mahasiswa->jurusan }}</td>
+                  <td>{{ $mahasiswa->dospem }}</td>
+                  <td>({{ $mahasiswa->mulai_tanggal }}) - ({{ $mahasiswa->sampai_tanggal }})</td>
+                </tr>
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       <div class="row">
         <div class="col-md-12">
           <form action="{{ route('pengajuan.terima', $pengajuan->id) }}" method="POST" style="display:inline-block;">

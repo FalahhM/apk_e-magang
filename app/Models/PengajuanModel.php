@@ -15,4 +15,9 @@ class PengajuanModel extends Model
     {
         return $this->belongsTo(User::class, 'user_id', 'id');
     }
+
+    public function mahasiswas()
+    {
+        return $this->hasMany(MahasiswaModel::class,'pengajuan_id','id');
+    }
 }

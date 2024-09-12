@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 
 class MagangController extends Controller
 {
+    // Menampilkan halaman kampus
     public function nampil()
     {
         $userId = Auth::id();
@@ -20,6 +21,7 @@ class MagangController extends Controller
         return view('formkampus.kampus', compact('user', 'contact_person'));
     }
 
+    // Menampilkan form pengajuan
     public function pengajuan()
     {
         $userId = Auth::id();
@@ -28,8 +30,10 @@ class MagangController extends Controller
         return view('formkampus.formpengajuan', compact('user'));
     }
 
+    // Menyimpan pengajuan ke database
     public function storePengajuan(Request $request)
     {
+        // Validasi data pengajuan
         $validatedData = $request->validate([
             'no_surat' => 'required|string|max:255',
             'tanggal_surat' => 'required|date',
@@ -53,6 +57,7 @@ class MagangController extends Controller
 
         // Simpan data mahasiswa jika ada
         if ($request->filled('mahasiswa')) {
+            // Decode JSON mahasiswa menjadi array
             $mahasiswaList = json_decode($request->input('mahasiswa'), true);
             foreach ($mahasiswaList as $mahasiswa) {
                 MahasiswaModel::create([
@@ -67,7 +72,7 @@ class MagangController extends Controller
             }
         }
 
-        return redirect()->route('tampilPengajuan')->with('success', 'Pengajuan berhasil disimpan!');
+        // Redirect dengan pesan sukses
+        return redirect()->route('formPengajuan')->with('success', 'Pengajuan berhasil disimpan!');
     }
 }
-

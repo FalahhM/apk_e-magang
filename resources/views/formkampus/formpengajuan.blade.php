@@ -24,160 +24,166 @@
         <div class="form-group mt-4">
             <label for="dokumen">Unggah Surat Permohonan</label>
             <input type="file" class="form-control-file" id="dokumen" name="dokumen" accept="application/pdf">
-            <small class="form-text text-muted">Format dokumen: PDF</small>
+            <small class="form-text text-muted">Format: .pdf</small>
         </div>
 
-        <input type="hidden" id="mahasiswaInput" name="mahasiswa">
+        <h4 class="mt-5">Data Mahasiswa</h4>
+        <button type="button" class="btn btn-primary mt-2" data-toggle="modal" data-target="#mahasiswaModal">
+            Tambah Mahasiswa
+        </button>
 
-        <div class="form-group">
-            <!-- Button trigger modal -->
-            <button type="button" class="btn btn-info mt-2" data-toggle="modal" data-target="#studentModal">
-                Tambah Mahasiswa
-            </button>
-        </div>
-
-        <!-- Table for Students Data -->
-        <table class="table table-bordered table-hover">
+        <table class="table table-bordered mt-3">
             <thead>
                 <tr>
                     <th>No</th>
-                    <th>Nama Mahasiswa</th>
+                    <th>Nama</th>
                     <th>NIM</th>
                     <th>Jurusan</th>
-                    <th>Dospem</th>
+                    <th>Dosen Pembimbing</th>
                     <th>Mulai Tanggal</th>
                     <th>Sampai Tanggal</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
-            <tbody id="studentTableBody">
-                <!-- Data mahasiswa akan di-render di sini -->
+            <tbody id="mahasiswaTable">
+                <!-- Data Mahasiswa akan ditambahkan di sini -->
             </tbody>
         </table>
 
-        <button type="submit" class="btn btn-primary">Kirim Pengajuan</button>
+        <input type="hidden" id="mahasiswa" name="mahasiswa"> <!-- Field hidden untuk data mahasiswa JSON -->
+
+        <button type="submit" class="btn btn-success mt-3">Kirim Pengajuan</button>
     </div>
 </form>
 
-<!-- Student Input Modal -->
-<div class="modal fade" id="studentModal" tabindex="-1" role="dialog" aria-labelledby="studentModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<!-- Modal untuk Menambah/Mengedit Mahasiswa -->
+<div class="modal fade" id="mahasiswaModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
         <div class="modal-content">
-            <form id="studentForm">
-                @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title" id="studentModalLabel">Input Data Mahasiswa</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Tambah/Mengedit Mahasiswa</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="formMahasiswa">
+                    <input type="hidden" id="indexMahasiswa">
                     <div class="form-group">
-                        <label for="nama_mahasiswa">Nama Mahasiswa</label>
-                        <input type="text" class="form-control" id="nama_mahasiswa" name="nama_mahasiswa" placeholder="Masukkan Nama Mahasiswa" required>
+                        <label for="nama">Nama</label>
+                        <input type="text" class="form-control" id="nama" placeholder="Nama Mahasiswa" required>
                     </div>
                     <div class="form-group">
                         <label for="nim">NIM</label>
-                        <input type="text" class="form-control" id="nim" name="nim" placeholder="Masukkan NIM" required>
+                        <input type="text" class="form-control" id="nim" placeholder="NIM Mahasiswa" required>
                     </div>
                     <div class="form-group">
                         <label for="jurusan">Jurusan</label>
-                        <input type="text" class="form-control" id="jurusan" name="jurusan" placeholder="Masukkan Jurusan" required>
+                        <input type="text" class="form-control" id="jurusan" placeholder="Jurusan Mahasiswa" required>
                     </div>
                     <div class="form-group">
-                        <label for="dospem">Dospem</label>
-                        <input type="text" class="form-control" id="dospem" name="dospem" placeholder="Masukkan Nama Dospem" required>
+                        <label for="dospem">Dosen Pembimbing</label>
+                        <input type="text" class="form-control" id="dospem" placeholder="Dosen Pembimbing" required>
                     </div>
                     <div class="form-group">
                         <label for="mulaiTanggal">Mulai Tanggal</label>
-                        <input type="date" class="form-control" id="mulaiTanggal" name="mulai_tanggal">
+                        <input type="date" class="form-control" id="mulaiTanggal" required>
                     </div>
                     <div class="form-group">
                         <label for="sampaiTanggal">Sampai Tanggal</label>
-                        <input type="date" class="form-control" id="sampaiTanggal" name="sampai_tanggal">
+                        <input type="date" class="form-control" id="sampaiTanggal" required>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                    <button type="button" class="btn btn-primary" id="saveStudent">Simpan</button>
-                </div>
-            </form>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="resetForm()">Batal</button>
+                <button type="button" class="btn btn-primary" id="simpanMahasiswa">Simpan</button>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    let mahasiswaData = [];
+    let mahasiswaList = []; // Menyimpan daftar mahasiswa sementara sebelum dikirim ke server
 
-    function renderTable() {
-        const tbody = document.getElementById('studentTableBody');
-        tbody.innerHTML = '';
-        mahasiswaData.forEach((mahasiswa, index) => {
-            let row = `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${mahasiswa.nama}</td>
-                    <td>${mahasiswa.nim}</td>
-                    <td>${mahasiswa.jurusan}</td>
-                    <td>${mahasiswa.dospem}</td>
-                    <td>${mahasiswa.mulaiTanggal}</td>
-                    <td>${mahasiswa.sampaiTanggal}</td>
-                    <td>
-                        <button type="button" class="btn btn-warning btn-sm" onclick="editMahasiswa(${index})">Edit</button>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="removeMahasiswa(${index})">Hapus</button>
-                    </td>
-                </tr>
-            `;
-            tbody.insertAdjacentHTML('beforeend', row);
-        });
+    document.getElementById('simpanMahasiswa').addEventListener('click', function() {
+        const nama = document.getElementById('nama').value;
+        const nim = document.getElementById('nim').value;
+        const jurusan = document.getElementById('jurusan').value;
+        const dospem = document.getElementById('dospem').value;
+        const mulaiTanggal = document.getElementById('mulaiTanggal').value;
+        const sampaiTanggal = document.getElementById('sampaiTanggal').value;
+        const index = document.getElementById('indexMahasiswa').value;
 
-        // Update hidden input with JSON string
-        document.getElementById('mahasiswaInput').value = JSON.stringify(mahasiswaData);
-    }
+        // Validasi input
+        if (!nama || !nim || !jurusan || !dospem || !mulaiTanggal || !sampaiTanggal) {
+            alert('Semua field harus diisi');
+            return;
+        }
 
-    document.getElementById('saveStudent').addEventListener('click', function() {
-        const form = document.getElementById('studentForm');
-        const nama = form.querySelector('#nama_mahasiswa').value;
-        const nim = form.querySelector('#nim').value;
-        const jurusan = form.querySelector('#jurusan').value;
-        const dospem = form.querySelector('#dospem').value;
-        const mulaiTanggal = form.querySelector('#mulaiTanggal').value;
-        const sampaiTanggal = form.querySelector('#sampaiTanggal').value;
+        const mahasiswa = { nama, nim, jurusan, dospem, mulaiTanggal, sampaiTanggal };
 
-        mahasiswaData.push({
-            nama: nama,
-            nim: nim,
-            jurusan: jurusan,
-            dospem: dospem,
-            mulaiTanggal: mulaiTanggal,
-            sampaiTanggal: sampaiTanggal
-        });
+        // Tambah atau edit mahasiswa
+        if (index === '') {
+            mahasiswaList.push(mahasiswa);
+        } else {
+            mahasiswaList[index] = mahasiswa;
+        }
 
-        renderTable();
-        $('#studentModal').modal('hide');
-        form.reset();
+        renderMahasiswaTable();
+        resetForm();
+        $('#mahasiswaModal').modal('hide');
     });
 
-    window.editMahasiswa = function(index) {
-        const mahasiswa = mahasiswaData[index];
-        document.getElementById('nama_mahasiswa').value = mahasiswa.nama;
+    function renderMahasiswaTable() {
+        const tbody = document.getElementById('mahasiswaTable');
+        tbody.innerHTML = ''; // Bersihkan tabel
+        mahasiswaList.forEach((mahasiswa, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${mahasiswa.nama}</td>
+                <td>${mahasiswa.nim}</td>
+                <td>${mahasiswa.jurusan}</td>
+                <td>${mahasiswa.dospem}</td>
+                <td>${mahasiswa.mulaiTanggal}</td>
+                <td>${mahasiswa.sampaiTanggal}</td>
+                <td>
+                    <button type="button" class="btn btn-warning btn-sm" onclick="editMahasiswa(${index})">Edit</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusMahasiswa(${index})">Hapus</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        // Simpan data mahasiswa ke input hidden
+        document.getElementById('mahasiswa').value = JSON.stringify(mahasiswaList);
+    }
+
+    function editMahasiswa(index) {
+        const mahasiswa = mahasiswaList[index];
+        document.getElementById('nama').value = mahasiswa.nama;
         document.getElementById('nim').value = mahasiswa.nim;
         document.getElementById('jurusan').value = mahasiswa.jurusan;
         document.getElementById('dospem').value = mahasiswa.dospem;
         document.getElementById('mulaiTanggal').value = mahasiswa.mulaiTanggal;
         document.getElementById('sampaiTanggal').value = mahasiswa.sampaiTanggal;
+        document.getElementById('indexMahasiswa').value = index;
+        $('#mahasiswaModal').modal('show');
+    }
 
-        $('#studentModal').modal('show');
-        mahasiswaData.splice(index, 1);
-        renderTable();
-    };
+    function hapusMahasiswa(index) {
+        if (confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+            mahasiswaList.splice(index, 1);
+            renderMahasiswaTable();
+        }
+    }
 
-    window.removeMahasiswa = function(index) {
-        mahasiswaData.splice(index, 1);
-        renderTable();
-    };
-});
+    function resetForm() {
+        document.getElementById('formMahasiswa').reset();
+        document.getElementById('indexMahasiswa').value = '';
+    }
 </script>
 
 @endsection
+    
