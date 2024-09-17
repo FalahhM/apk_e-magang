@@ -32,3 +32,6 @@ Route::middleware(['auth'])->group(function() {
     Route::get('/formpengajuan', [MagangController::class, 'pengajuan'])->name('formPengajuan');
     Route::post('/storepengajuan', [MagangController::class, 'storePengajuan'])->name('storePengajuan');
 });
+
+
+Route::get('/email/verify/{id}/{token}', [SesiController::class, 'verifyEmail'])->name('email.verify');
