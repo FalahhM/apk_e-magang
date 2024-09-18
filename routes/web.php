@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AdminController;
-use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\MagangController;
 use App\Http\Controllers\SesiController;
 use Illuminate\Support\Facades\Route;
@@ -26,7 +25,7 @@ Route::middleware(['auth', 'userAkses:admin'])->group(function() {
 
 // Rute untuk User Authenticated (Akses untuk Magang)
 Route::middleware(['auth'])->group(function() {
-    Route::get('/tampilanawal', [DashboardController::class, 'index'])->name('tampilanawal');
+    Route::get('/kampusdashboard', [MagangController::class, 'kampusDashboard'])->name('kampusdashboard');
     Route::get('/kampus', [MagangController::class, 'nampil'])->name('kampus');
     Route::post('/logout', [SesiController::class, 'logout'])->name('logout');
     Route::get('/formpengajuan', [MagangController::class, 'pengajuan'])->name('formPengajuan');

@@ -35,13 +35,13 @@ class SesiController extends Controller
     if (Auth::attempt($infologin)) {
         if (!Auth::user()->email_verified_at) {
             Auth::logout();
-            return redirect('/login')->withErrors('Silakan verifikasi email Anda sebelum login.');
+            return redirect('/')->withErrors('Silakan verifikasi email Anda sebelum login.');
         }
 
         if (Auth::user()->role == 'admin') {
             return redirect('/admin');
         } elseif (Auth::user()->role == 'kampus') {
-            return redirect('/tampilanawal');
+            return redirect('/kampus/dashboard');
         }
     } else {
         return redirect('/')->withErrors('Email dan password yang dimasukkan tidak sesuai')->withInput();

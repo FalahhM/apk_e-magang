@@ -21,6 +21,15 @@ class MagangController extends Controller
         return view('formkampus.kampus', compact('user', 'contact_person'));
     }
 
+    // Dashboard
+    public function kampusDashboard(){
+        $user = auth()->user();
+        $contact_person = ContactPerson::where('user_id', $user->id)->first();
+        $pengajuan = PengajuanModel::where('user_id', $user->id)->get();
+
+        return view('formkampus.dashboard', compact('user', 'contact_person', 'pengajuan'));
+    }
+
     // Menampilkan form pengajuan
     public function pengajuan()
     {
@@ -39,12 +48,12 @@ class MagangController extends Controller
             'tanggal_surat' => 'required|date',
             'perihal' => 'required|string|max:255',
             'dokumen' => 'nullable|file|mimes:pdf',
-            'mahasiswa' => 'nullable|string', // ubah menjadi string karena data dikirim dalam bentuk JSON string
+            'mahasiswa' => 'nullable|string', 
         ]);
 
         $validatedData['user_id'] = Auth::id();
 
-        // Simpan dokumen jika ada
+        // Simpan dokumen 
         if ($request->hasFile('dokumen')) {
             $file = $request->file('dokumen');
             $filename = time() . '_' . $file->getClientOriginalName();
@@ -57,7 +66,6 @@ class MagangController extends Controller
 
         // Simpan data mahasiswa jika ada
         if ($request->filled('mahasiswa')) {
-            // Decode JSON mahasiswa menjadi array
             $mahasiswaList = json_decode($request->input('mahasiswa'), true);
             foreach ($mahasiswaList as $mahasiswa) {
                 MahasiswaModel::create([
