@@ -41,7 +41,7 @@ class SesiController extends Controller
         if (Auth::user()->role == 'admin') {
             return redirect('/admin');
         } elseif (Auth::user()->role == 'kampus') {
-            return redirect('/kampus/dashboard');
+            return redirect('/kampusdashboard');
         }
     } else {
         return redirect('/')->withErrors('Email dan password yang dimasukkan tidak sesuai')->withInput();
@@ -121,7 +121,9 @@ function verifyEmail($id, $token)
 
 
     function logout(){
-        Auth::logout();
-        return redirect('');
+    Auth::logout();
+    request()->session()->invalidate();
+    request()->session()->regenerateToken();
+    return redirect('/');
     }
 }
