@@ -87,12 +87,12 @@
 
       <div class="row">
         <div class="col-md-12">
-          <form action="{{ route('pengajuan.terima', $pengajuan->id) }}" method="POST" style="display:inline-block;">
+          <form action="" method="POST" style="display:inline-block;">
             @csrf
             <button type="submit" class="btn btn-success">Terima</button>
           </form>
 
-          <form action="{{ route('pengajuan.tolak', $pengajuan->id) }}" method="POST" style="display:inline-block; margin-left: 10px;">
+          <form action="" method="POST" style="display:inline-block; margin-left: 10px;">
             @csrf
             <button type="submit" class="btn btn-danger">Tolak</button>
           </form>

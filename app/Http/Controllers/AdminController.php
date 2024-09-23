@@ -26,17 +26,5 @@ class AdminController extends Controller
         return view('menuadmin.detailpengajuan', compact('pengajuan'));
     }
 
-    public function terimapengajuan($id){
-        $pengajuan = PengajuanModel::findOrFail($id);
-        $pengajuan->status = 'Diterima';
-        $pengajuan->save();
-        return redirect()->route('tampilPengajuan')->with('success', 'Pengajuan berhasil diterima');
-    }
 
-    public function tolakpengajuan($id){
-        $pengajuan = PengajuanModel::findOrFail($id);
-        $pengajuan->status = 'Ditolak';
-        $pengajuan->save();
-        return redirect()->route('tampilPengajuan')->with('success', 'Pengajuan berhasil ditolak');
-    }
 }
