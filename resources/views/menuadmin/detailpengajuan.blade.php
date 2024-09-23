@@ -12,14 +12,18 @@
         </div>
         <div class="col-md-6">
           <h5>Tanggal Pengajuan:</h5>
-          <p>{{ $pengajuan->tanggal_surat }}</p>
+          <p>({{ \Carbon\Carbon::parse($pengajuan->tanggal_surat)->format('d/m/Y') }})</p>
         </div>
       </div>
 
       <div class="row mb-3">
-        <div class="col-md-12">
+        <div class="col-md-6">
           <h5>Perihal:</h5>
           <p>{{ $pengajuan->perihal }}</p>
+        </div>
+        <div class="col-md-6">
+          <h5>Periode:</h5>
+          <p>({{ \Carbon\Carbon::parse($pengajuan->mulai_tanggal)->format('d/m/Y') }}) - ({{ \Carbon\Carbon::parse($pengajuan->sampai_tanggal)->format('d/m/Y') }})</p>
         </div>
       </div>
 
@@ -66,7 +70,6 @@
                 <th>NIM</th>
                 <th>Jurusan</th>
                 <th>Dosen Pembimbing</th>
-                <th>Periode</th>
               </tr>
             </thead>
             <tbody>
@@ -77,7 +80,6 @@
                   <td>{{ $mahasiswa->nim }}</td>
                   <td>{{ $mahasiswa->jurusan }}</td>
                   <td>{{ $mahasiswa->dospem }}</td>
-                  <td>({{ $mahasiswa->mulai_tanggal }}) - ({{ $mahasiswa->sampai_tanggal }})</td>
                 </tr>
               @endforeach
             </tbody>
@@ -87,17 +89,39 @@
 
       <div class="row">
         <div class="col-md-12">
-          <form action="" method="POST" style="display:inline-block;">
-            @csrf
-            <button type="submit" class="btn btn-success">Terima</button>
-          </form>
-
-          <form action="" method="POST" style="display:inline-block; margin-left: 10px;">
-            @csrf
-            <button type="submit" class="btn btn-danger">Tolak</button>
-          </form>
+          <!-- Tombol Terima -->
+          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalTerimaPengajuan">
+            Terima
+          </button>
         </div>
       </div>
+
+      {{-- modal terima pengajuan --}}
+      <div class="modal fade" id="modalTerimaPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalTerimaPengajuanLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="modalTerimaPengajuanLabel">Masukkan Nomor Surat</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <label for="no_surat">No Surat</label>
+                  <input type="text" class="form-control" id="no_surat" name="no_surat" required>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                  <button type="button" class="btn btn-primary">Kirim</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

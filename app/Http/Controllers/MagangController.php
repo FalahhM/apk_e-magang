@@ -48,6 +48,8 @@ class MagangController extends Controller
             'tanggal_surat' => 'required|date',
             'perihal' => 'required|string|max:255',
             'dokumen' => 'nullable|file|mimes:pdf',
+            'mulai_tanggal' => 'required|date',
+            'sampai_tanggal' => 'required|date',
             'mahasiswa' => 'nullable|string', 
         ]);
 
@@ -74,13 +76,11 @@ class MagangController extends Controller
                     'nim' => $mahasiswa['nim'],
                     'jurusan' => $mahasiswa['jurusan'],
                     'dospem' => $mahasiswa['dospem'],
-                    'mulai_tanggal' => $mahasiswa['mulaiTanggal'],
-                    'sampai_tanggal' => $mahasiswa['sampaiTanggal']
                 ]);
             }
         }
 
         // Redirect dengan pesan sukses
-        return redirect()->route('formPengajuan')->with('success', 'Pengajuan berhasil disimpan!');
+        return redirect()->route('kampusdashboard')->with('success', 'Pengajuan berhasil disimpan!');
     }
 }

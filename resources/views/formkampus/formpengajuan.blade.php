@@ -21,6 +21,16 @@
             <input type="text" class="form-control" id="perihal" name="perihal" placeholder="Isi Perihal" required>
         </div>
 
+        <div class="form-group">
+            <label for="mulai_tanggal">Mulai Tanggal</label>
+            <input type="date" class="form-control" id="mulai_tanggal" name="mulai_tanggal"  required>
+        </div>
+
+        <div class="form-group">
+            <label for="sampai_tanggal">Sampai Tanggal</label>
+            <input type="date" class="form-control" id="sampai_tanggal" name="sampai_tanggal" required>
+        </div>
+
         <div class="form-group mt-4">
             <label for="dokumen">Unggah Surat Permohonan</label>
             <input type="file" class="form-control-file" id="dokumen" name="dokumen" accept="application/pdf">
@@ -40,8 +50,6 @@
                     <th>NIM</th>
                     <th>Jurusan</th>
                     <th>Dosen Pembimbing</th>
-                    <th>Mulai Tanggal</th>
-                    <th>Sampai Tanggal</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -85,14 +93,6 @@
                         <label for="dospem">Dosen Pembimbing</label>
                         <input type="text" class="form-control" id="dospem" placeholder="Dosen Pembimbing" required>
                     </div>
-                    <div class="form-group">
-                        <label for="mulaiTanggal">Mulai Tanggal</label>
-                        <input type="date" class="form-control" id="mulaiTanggal" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="sampaiTanggal">Sampai Tanggal</label>
-                        <input type="date" class="form-control" id="sampaiTanggal" required>
-                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -111,17 +111,15 @@
         const nim = document.getElementById('nim').value;
         const jurusan = document.getElementById('jurusan').value;
         const dospem = document.getElementById('dospem').value;
-        const mulaiTanggal = document.getElementById('mulaiTanggal').value;
-        const sampaiTanggal = document.getElementById('sampaiTanggal').value;
         const index = document.getElementById('indexMahasiswa').value;
 
         // Validasi input
-        if (!nama || !nim || !jurusan || !dospem || !mulaiTanggal || !sampaiTanggal) {
+        if (!nama || !nim || !jurusan || !dospem) {
             alert('Semua field harus diisi');
             return;
         }
 
-        const mahasiswa = { nama, nim, jurusan, dospem, mulaiTanggal, sampaiTanggal };
+        const mahasiswa = { nama, nim, jurusan, dospem };
 
         // Tambah atau edit mahasiswa
         if (index === '') {
@@ -146,8 +144,6 @@
                 <td>${mahasiswa.nim}</td>
                 <td>${mahasiswa.jurusan}</td>
                 <td>${mahasiswa.dospem}</td>
-                <td>${mahasiswa.mulaiTanggal}</td>
-                <td>${mahasiswa.sampaiTanggal}</td>
                 <td>
                     <button type="button" class="btn btn-warning btn-sm" onclick="editMahasiswa(${index})">Edit</button>
                     <button type="button" class="btn btn-danger btn-sm" onclick="hapusMahasiswa(${index})">Hapus</button>
@@ -166,8 +162,6 @@
         document.getElementById('nim').value = mahasiswa.nim;
         document.getElementById('jurusan').value = mahasiswa.jurusan;
         document.getElementById('dospem').value = mahasiswa.dospem;
-        document.getElementById('mulaiTanggal').value = mahasiswa.mulaiTanggal;
-        document.getElementById('sampaiTanggal').value = mahasiswa.sampaiTanggal;
         document.getElementById('indexMahasiswa').value = index;
         $('#mahasiswaModal').modal('show');
     }

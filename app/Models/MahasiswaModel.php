@@ -14,8 +14,6 @@ class MahasiswaModel extends Model
         'nim',
         'jurusan',
         'dospem',
-        'mulai_tanggal',
-        'sampai_tanggal',
         'pengajuan_id',
     ];
 }
