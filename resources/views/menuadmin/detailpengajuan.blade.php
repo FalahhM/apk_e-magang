@@ -5,6 +5,21 @@
   <h3>Detail Pengajuan Magang</h3>
   <div class="card shadow mb-4">
     <div class="card-body">
+      <div class="row mb-4">
+        <div class="col-md-3 d-flex justify-content-between">
+          @if($pengajuan->status === 'Sedang Di Proses')
+            <button type="button" class="btn btn-primary">Cetak</button>
+            <button type="button" class="btn btn-success">Terima</button>
+            <button type="button" class="btn btn-danger">Tolak</button>
+          @elseif($pengajuan->status === 'Pending')
+            <form action="{{ route('prosesPengajuan', ['id' => $pengajuan->id]) }}" method="POST">
+              @csrf
+              <button type="submit" class="btn btn-primary">Proses</button>
+            </form>
+          @endif
+        </div>
+      </div>
+
       <div class="row mb-3">
         <div class="col-md-6">
           <h5>No. Surat:</h5>
@@ -86,42 +101,6 @@
           </table>
         </div>
       </div>
-
-      <div class="row">
-        <div class="col-md-12">
-          <!-- Tombol Terima -->
-          <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalTerimaPengajuan">
-            Terima
-          </button>
-        </div>
-      </div>
-
-      {{-- modal terima pengajuan --}}
-      <div class="modal fade" id="modalTerimaPengajuan" tabindex="-1" role="dialog" aria-labelledby="modalTerimaPengajuanLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="modalTerimaPengajuanLabel">Masukkan Nomor Surat</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form>
-                <div class="form-group">
-                  <label for="no_surat">No Surat</label>
-                  <input type="text" class="form-control" id="no_surat" name="no_surat" required>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                  <button type="button" class="btn btn-primary">Kirim</button>
-                </div>
-              </form>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 </div>

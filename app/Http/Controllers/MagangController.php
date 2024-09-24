@@ -64,6 +64,7 @@ class MagangController extends Controller
         }
 
         // Simpan data pengajuan
+        $validatedData['status'] = 'Pending';
         $pengajuan = PengajuanModel::create($validatedData);
 
         // Simpan data mahasiswa jika ada
