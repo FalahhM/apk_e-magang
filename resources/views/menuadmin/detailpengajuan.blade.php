@@ -7,16 +7,17 @@
     <div class="card-body">
       <div class="row mb-4">
         <div class="col-md-3 d-flex justify-content-between">
-          @if($pengajuan->status === 'Sedang Di Proses')
-            <button type="button" class="btn btn-primary">Cetak</button>
-            <button type="button" class="btn btn-success">Terima</button>
-            <button type="button" class="btn btn-danger">Tolak</button>
-          @elseif($pengajuan->status === 'Pending')
-            <form action="{{ route('prosesPengajuan', ['id' => $pengajuan->id]) }}" method="POST">
-              @csrf
-              <button type="submit" class="btn btn-primary">Proses</button>
-            </form>
-          @endif
+            @if($pengajuan->status === 'Sedang Di Proses')
+                <a href="{{ route('cetakProsesPDF', ['id' => $pengajuan->id]) }}" class="btn btn-primary">Cetak</a>
+                <button type="button" class="btn btn-success">Terima</button>
+                <button type="button" class="btn btn-danger">Tolak</button>
+            @elseif($pengajuan->status === 'Pending')
+                <form action="{{ route('prosesPengajuan', ['id' => $pengajuan->id]) }}" method="POST">
+                    @csrf
+                    <input type="hidden" name="status" value="Sedang Di Proses"> <!-- Set status yang diinginkan -->
+                    <button type="submit" class="btn btn-primary">Proses</button>
+                </form>
+            @endif
         </div>
       </div>
 
@@ -45,8 +46,8 @@
       <div class="row mb-3">
         <div class="col-md-12">
           <h5>Surat:</h5>
-          @if($pengajuan->dokumen)
-            <a href="{{ asset('uploads/' . $pengajuan->dokumen) }}" target="_blank" class="btn btn-primary">Lihat Surat</a>
+          @if($pengajuan->dokumen_file)
+            <a href="{{ \Storage::url($pengajuan->dokumen_file) }}" target="_blank" class="btn btn-primary">Lihat Surat</a>
           @else
             <p>Dokumen tidak tersedia</p>
           @endif

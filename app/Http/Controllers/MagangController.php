@@ -59,8 +59,9 @@ class MagangController extends Controller
         if ($request->hasFile('dokumen')) {
             $file = $request->file('dokumen');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('uploads'), $filename);
-            $validatedData['dokumen'] = $filename;
+            $file->storeAs('public/uploads', $filename); 
+            $validatedData['dokumen_name'] = $filename; 
+            $validatedData['dokumen_file'] = 'uploads/' . $filename;
         }
 
         // Simpan data pengajuan
