@@ -21,6 +21,8 @@ Route::middleware(['auth', 'userAkses:admin'])->group(function() {
     Route::get('/detailpengajuan/{id}', [AdminController::class, 'detailpengajuan'])->name('detailpengajuan');
     Route::post('/prosespengajuan{id}', [AdminController::class, 'prosesPengajuan'])->name('prosesPengajuan');
     Route::get('/detailpengajuan/{id}/cetak', [AdminController::class, 'cetakProsesPDF'])->name('cetakProsesPDF');
+    Route::post('/terimapengajuan{id}', [AdminController::class, 'terimaPengajuan'])->name('terimaPengajuan');
+    Route::get('/pengajuan/{id}/surat-terima', [AdminController::class, 'lihatSuratTerima'])->name('lihatSuratTerima');
 });
 
 // Rute untuk User Authenticated (Akses untuk Magang)
