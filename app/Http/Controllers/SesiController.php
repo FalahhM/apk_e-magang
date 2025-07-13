@@ -38,6 +38,8 @@ class SesiController extends Controller
             return redirect('/')->withErrors('Silakan verifikasi email Anda sebelum login.');
         }
 
+        session()->forget('user_email');
+
         if (Auth::user()->role == 'admin') {
             return redirect('/admin');
         } elseif (Auth::user()->role == 'kampus') {
@@ -96,11 +98,16 @@ function register(Request $request)
     $user->email_verification_token = Str::random(32);
     $user->save();
 
-    // Send verification email
+    // Kirim email verifikasi
     Mail::to($user->email)->send(new VerifyEmail($user));
 
-    return redirect()->route('login')->with('success', 'Registrasi berhasil! Silahkan cek email Anda untuk verifikasi.');
+    // ✅ Simpan email user ke session untuk polling verifikasi
+    session(['user_email' => $user->email]);
+
+    // ✅ Tampilkan halaman yang menunggu verifikasi
+    return view('please-verify');
 }
+
 
 
 function verifyEmail($id, $token)

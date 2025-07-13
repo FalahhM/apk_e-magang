@@ -1,50 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <!-- CSS only -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
-    <title>Login</title>
+    <title>Login - PTPN IV Regional IV</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #eef7ee, #d6f5d6);
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .login-box {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+        }
+
+        .brand-header {
+            color: #2e7d32;
+        }
+
+        .btn-green {
+            background-color: #388e3c;
+            color: white;
+        }
+
+        .btn-green:hover {
+            background-color: #2e7d32;
+        }
+
+        .ptpn-logo {
+            height: 100px;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            font-size: 13px;
+            color: #777;
+        }
+    </style>
 </head>
 <body>
-    <div class="container py-5">
-        <div class="d-flex justify-content-center">
-            <div class="w-50 border rounded px-3 py-3">
-                <h1>Login</h1>
-                @if($errors->any())
-                <div class="alert alert-danger">
-                    <ul>
+    <div class="container min-vh-100 d-flex justify-content-center align-items-center">
+        <div class="login-box text-center">
+            <img src="https://yt3.googleusercontent.com/ytc/AIdro_nmJ8vS3qrBIAo-Vf48vC4M-dL8TrT8rSjWtBWCJV9Y8zE=s900-c-k-c0x00ffffff-no-rj" alt="Logo PTPN IV" class="ptpn-logo mb-3">
+            <h2 class="brand-header mb-3">PTPN IV Regional IV</h2>
+            <p class="text-muted">Silakan login untuk melanjutkan</p>
+
+            @if($errors->any())
+                <div class="alert alert-danger text-start">
+                    <ul class="mb-0">
                         @foreach ($errors->all() as $item)
-                        <li>{{ $item }}</li>
+                            <li>{{ $item }}</li>
                         @endforeach
                     </ul>
                 </div>
-                @endif
+            @endif
 
-                @if(session('success'))
+            @if(session('success'))
                 <div class="alert alert-success">
                     {{ session('success') }}
                 </div>
-                @endif
+            @endif
 
-                <form action="{{ route('login') }}" method="POST">
-                    @csrf
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" value="{{ old('email') }}" name="email" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control">
-                    </div>
-                    <div class="mb-3 d-grid">
-                        <button name="submit" type="submit" class="btn btn-primary">Login</button>
-                    </div>
-                </form>
-                <p>Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a></p>
-            </div>
+            <form action="{{ route('login') }}" method="POST" class="text-start mt-4">
+                @csrf
+                <div class="mb-3">
+                    <label for="email" class="form-label">Alamat Email</label>
+                    <input type="email" name="email" class="form-control" value="{{ old('email') }}" required>
+                </div>
+
+                <div class="mb-3">
+                    <label for="password" class="form-label">Kata Sandi</label>
+                    <input type="password" name="password" class="form-control" required>
+                </div>
+
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-green">Login</button>
+                </div>
+            </form>
+
+            <p class="mt-3">Belum punya akun? <a href="{{ route('register') }}">Daftar di sini</a></p>
+            
         </div>
     </div>
 </body>

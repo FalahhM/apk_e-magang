@@ -2,7 +2,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>Copyright &copy; Your Website 2021</span>
+                        <span></span>
                     </div>
                 </div>
             </footer>
@@ -25,6 +25,8 @@
     <!-- Page level custom scripts -->
     <script src="dashboard/js/demo/chart-area-demo.js"></script>
     <script src="dashboard/js/demo/chart-pie-demo.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
 </body>
 

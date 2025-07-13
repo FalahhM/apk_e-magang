@@ -36,5 +36,17 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/storepengajuan', [MagangController::class, 'storePengajuan'])->name('storePengajuan');
 });
 
+Route::get('/check-verification', function () {
+    $user = session('user_email') 
+        ? \App\Models\User::where('email', session('user_email'))->first()
+        : auth()->user();
+
+    if ($user && $user->email_verified_at) {
+        return response()->json(['verified' => true]);
+    }
+
+    return response()->json(['verified' => false]);
+});
+
 
 Route::get('/email/verify/{id}/{token}', [SesiController::class, 'verifyEmail'])->name('email.verify');
