@@ -17,9 +17,31 @@ use App\Mail\PengajuanDitolakMail;
 
 class AdminController extends Controller
 {
-    public function index(){
-        return view('admin');
+    public function index()
+    {
+        $total_pengajuan = \App\Models\PengajuanModel::count();
+        $pengajuan_diterima = \App\Models\PengajuanModel::where('status', 'Diterima')->count();
+        $pengajuan_ditolak = \App\Models\PengajuanModel::where('status', 'Ditolak')->count();
+        $pengajuan_diproses = \App\Models\PengajuanModel::where('status', 'Sedang Di Proses')->count();
+
+        return view('admin', [
+            'total_pengajuan' => $total_pengajuan,
+            'pengajuan_diterima' => $pengajuan_diterima,
+            'pengajuan_ditolak' => $pengajuan_ditolak,
+            'pengajuan_diproses' => $pengajuan_diproses,
+        ]);
     }
+
+
+    public function statistikDashboard() {
+        $total = PengajuanModel::count();
+        $diterima = PengajuanModel::where('status', 'Diterima')->count();
+        $ditolak = PengajuanModel::where('status', 'Ditolak')->count();
+        $diproses = PengajuanModel::where('status', 'Sedang Di Proses')->count();
+        
+        return view('menuadmin.dashboard', compact('total', 'diterima', 'ditolak', 'diproses'));
+    }
+
 
     public function tampilPengajuan(){
         $data_pengajuan = PengajuanModel::with('user')->get();

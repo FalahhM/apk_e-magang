@@ -27,7 +27,6 @@
         font-weight: bold;
     }
 
-    /* Floating Notification */
     #notifFloating {
         position: fixed;
         bottom: 20px;
@@ -109,66 +108,15 @@
                                     </span>
                                 </td>
                                 <td>
-                                  <!-- Tambahkan tombol untuk setiap pengajuan -->
-                                  <button 
-                                      type="button" 
-                                      class="btn btn-info btn-sm" 
-                                      data-toggle="modal" 
-                                      data-target="#detailModal{{ $peng->id }}">
-                                      Detail
-                                  </button>
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-info btn-sm" 
+                                        data-toggle="modal" 
+                                        data-target="#detailModal{{ $peng->id }}">
+                                        Detail
+                                    </button>
                                 </td>
                             </tr>
-                            <!-- Modal -->
-                            <div class="modal fade" id="detailModal{{ $peng->id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel{{ $peng->id }}" aria-hidden="true">
-                              <div class="modal-dialog modal-lg" role="document">
-                                <div class="modal-content">
-                                  <div class="modal-header bg-success text-white">
-                                    <h5 class="modal-title" id="modalLabel{{ $peng->id }}">Detail Pengajuan Magang</h5>
-                                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                                      <span aria-hidden="true">&times;</span>
-                                    </button>
-                                  </div>
-                                  <div class="modal-body">
-                                    <p><strong>No Surat:</strong> {{ $peng->no_surat }}</p>
-                                    <p><strong>Tanggal Surat:</strong> {{ \Carbon\Carbon::parse($peng->tanggal_surat)->format('d-m-Y') }}</p>
-                                    <p><strong>Perihal:</strong> {{ $peng->perihal }}</p>
-                                    <p><strong>Periode Magang:</strong> {{ $peng->mulai_tanggal }} s.d {{ $peng->sampai_tanggal }}</p>
-                                    <p><strong>Status:</strong> {{ $peng->status }}</p>
-
-                                    <hr>
-                                    <h6>Data Mahasiswa</h6>
-                                    @if($peng->mahasiswas && count($peng->mahasiswas))
-                                        <table class="table table-sm table-bordered">
-                                          <thead class="table-success text-center">
-                                            <tr>
-                                              <th>Nama</th>
-                                              <th>NIM</th>
-                                              <th>Jurusan</th>
-                                              <th>Dosen Pembimbing</th>
-                                            </tr>
-                                          </thead>
-                                          <tbody>
-                                            @foreach($peng->mahasiswas as $mhs)
-                                              <tr>
-                                                <td>{{ $mhs->nama }}</td>
-                                                <td>{{ $mhs->nim }}</td>
-                                                <td>{{ $mhs->jurusan }}</td>
-                                                <td>{{ $mhs->dospem }}</td>
-                                              </tr>
-                                            @endforeach
-                                          </tbody>
-                                        </table>
-                                    @else
-                                        <p class="text-muted">Tidak ada data mahasiswa.</p>
-                                    @endif
-                                  </div>
-                                  <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
                         @endforeach
                     </tbody>
                 </table>
@@ -180,9 +128,64 @@
 </div>
 
 {{-- Floating Notification --}}
-<div id="notifFloating" onclick="scrollToPengajuan()" style="display: none;">
-    📄 Lihat Daftar Pengajuan Magang
+@if($pengajuan->count())
+    <div id="notifFloating" onclick="scrollToPengajuan()">
+        📄 Lihat Daftar Pengajuan Magang
+    </div>
+@endif
+
+{{-- Modal Detail Pengajuan --}}
+@foreach($pengajuan as $peng)
+<div class="modal fade" id="detailModal{{ $peng->id }}" tabindex="-1" role="dialog" aria-labelledby="modalLabel{{ $peng->id }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="modalLabel{{ $peng->id }}">Detail Pengajuan Magang</h5>
+                <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p><strong>No Surat:</strong> {{ $peng->no_surat }}</p>
+                <p><strong>Tanggal Surat:</strong> {{ \Carbon\Carbon::parse($peng->tanggal_surat)->format('d-m-Y') }}</p>
+                <p><strong>Perihal:</strong> {{ $peng->perihal }}</p>
+                <p><strong>Periode Magang:</strong> {{ $peng->mulai_tanggal }} s.d {{ $peng->sampai_tanggal }}</p>
+                <p><strong>Status:</strong> {{ $peng->status }}</p>
+
+                <hr>
+                <h6>Data Mahasiswa</h6>
+                @if($peng->mahasiswas && $peng->mahasiswas->count())
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-success text-center">
+                            <tr>
+                                <th>Nama</th>
+                                <th>NIM</th>
+                                <th>Jurusan</th>
+                                <th>Dosen Pembimbing</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($peng->mahasiswas as $mhs)
+                                <tr>
+                                    <td>{{ $mhs->nama_mahasiswa }}</td>
+                                    <td>{{ $mhs->nim }}</td>
+                                    <td>{{ $mhs->jurusan }}</td>
+                                    <td>{{ $mhs->dospem }}</td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <p class="text-muted">Tidak ada data mahasiswa.</p>
+                @endif
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+            </div>
+        </div>
+    </div>
 </div>
+@endforeach
 
 <script>
     function scrollToPengajuan() {
@@ -195,7 +198,6 @@
     document.addEventListener('DOMContentLoaded', () => {
         const notif = document.getElementById('notifFloating');
 
-        // Tampilkan notifikasi hanya jika data pengajuan ada
         @if($pengajuan->count())
             notif.style.display = 'block';
         @endif
