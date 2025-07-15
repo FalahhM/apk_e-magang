@@ -3,96 +3,86 @@
 namespace App\Http\Controllers;
 
 use App\Models\PengajuanModel;
+use App\Models\Absensi;
+use Illuminate\Http\Request;
+use Mpdf\Mpdf;
+use setasign\Fpdi\Fpdi;
 use Endroid\QrCode\Builder\Builder;
 use Endroid\QrCode\Encoding\Encoding;
 use Endroid\QrCode\Writer\PngWriter;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
-use Mpdf\Mpdf;
-use setasign\Fpdi\Fpdi;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PengajuanDiterimaMail;
 use App\Mail\PengajuanDitolakMail;
 
 class AdminController extends Controller
 {
+    // ✅ DASHBOARD
     public function index()
     {
-        $total_pengajuan = \App\Models\PengajuanModel::count();
-        $pengajuan_diterima = \App\Models\PengajuanModel::where('status', 'Diterima')->count();
-        $pengajuan_ditolak = \App\Models\PengajuanModel::where('status', 'Ditolak')->count();
-        $pengajuan_diproses = \App\Models\PengajuanModel::where('status', 'Sedang Di Proses')->count();
+        // Statistik pengajuan
+        $total_pengajuan     = PengajuanModel::count();
+        $pengajuan_diterima  = PengajuanModel::where('status', 'Diterima')->count();
+        $pengajuan_ditolak   = PengajuanModel::where('status', 'Ditolak')->count();
+        $pengajuan_diproses  = PengajuanModel::where('status', 'Sedang Di Proses')->count();
 
-        return view('admin', [
-            'total_pengajuan' => $total_pengajuan,
-            'pengajuan_diterima' => $pengajuan_diterima,
-            'pengajuan_ditolak' => $pengajuan_ditolak,
-            'pengajuan_diproses' => $pengajuan_diproses,
-        ]);
+        // Statistik absensi
+        $totalHadir = Absensi::where('status', 'Hadir')->count();
+        $totalIzin  = Absensi::where('status', 'Izin')->count();
+        $totalSakit = Absensi::where('status', 'Sakit')->count();
+        $totalAlfa  = Absensi::where('status', 'Alfa')->count();
+
+        return view('admin', compact(
+            'total_pengajuan',
+            'pengajuan_diterima',
+            'pengajuan_ditolak',
+            'pengajuan_diproses',
+            'totalHadir',
+            'totalIzin',
+            'totalSakit',
+            'totalAlfa'
+        ));
     }
 
-
-    public function statistikDashboard() {
-        $total = PengajuanModel::count();
-        $diterima = PengajuanModel::where('status', 'Diterima')->count();
-        $ditolak = PengajuanModel::where('status', 'Ditolak')->count();
-        $diproses = PengajuanModel::where('status', 'Sedang Di Proses')->count();
-        
-        return view('menuadmin.dashboard', compact('total', 'diterima', 'ditolak', 'diproses'));
-    }
-
-
-    public function tampilPengajuan(){
+    // ✅ TAMPIL PENGAJUAN
+    public function tampilPengajuan()
+    {
         $data_pengajuan = PengajuanModel::with('user')->get();
         return view('menuadmin.pengajuanmagang', compact('data_pengajuan'));
     }
 
-    public function detailpengajuan($id){
+    public function detailpengajuan($id)
+    {
         $pengajuan = PengajuanModel::with(['user.contactPerson', 'mahasiswas'])->findOrFail($id);
         return view('menuadmin.detailpengajuan', compact('pengajuan'));
     }
 
-    public function prosesPengajuan(Request $request, $id){
-        $request->validate([
-            'status' => 'required|string',
-        ]);
-
+    public function prosesPengajuan(Request $request, $id)
+    {
+        $request->validate(['status' => 'required|string']);
         $pengajuan = PengajuanModel::findOrFail($id);
-        $pengajuan->status = 'Sedang Di Proses'; 
+        $pengajuan->status = 'Sedang Di Proses';
         $pengajuan->save();
 
-        // Flash message
         session()->flash('message', 'Pengajuan berhasil diproses.');
-
         return redirect()->route('detailpengajuan', ['id' => $id]);
     }
 
-    public function bulanRomawi($bulan){
-        $romawi = [
-            1 => 'I',
-            2 => 'II',
-            3 => 'III',
-            4 => 'IV',
-            5 => 'V',
-            6 => 'VI',
-            7 => 'VII',
-            8 => 'VIII',
-            9 => 'IX',
-            10 => 'X',
-            11 => 'XI',
-            12 => 'XII',
-        ];
+    // ✅ ROMAWI UTILITY
+    public function bulanRomawi($bulan)
+    {
+        $romawi = [1 => 'I', 2 => 'II', 3 => 'III', 4 => 'IV', 5 => 'V', 6 => 'VI',
+                   7 => 'VII', 8 => 'VIII', 9 => 'IX', 10 => 'X', 11 => 'XI', 12 => 'XII'];
         return $romawi[$bulan] ?? '';
     }
 
-    public function cetakProsesPDF($id) {
+    // ✅ CETAK PROSES
+    public function cetakProsesPDF($id)
+    {
         $pengajuan = PengajuanModel::with(['user.contactPerson', 'mahasiswas'])->findOrFail($id);
-        
         $pengajuan->cetak_timestamp = now();
         $pengajuan->save();
 
-        $jumlahOrang = count($pengajuan->mahasiswas);
+        $jumlahOrang = $pengajuan->mahasiswas->count();
         $bulanRomawi = $this->bulanRomawi(now()->month);
 
         $html = view('menuadmin.pdf.surat', compact('pengajuan','jumlahOrang','bulanRomawi'))->render();
@@ -104,120 +94,89 @@ class AdminController extends Controller
 
         $secondPdfPath = public_path('storage/' . $pengajuan->dokumen_file);
         if (!file_exists($secondPdfPath)) {
-            dd("File tidak ditemukan: " . $secondPdfPath);
+            abort(404, "File tidak ditemukan: " . $secondPdfPath);
         }
 
         $fpdi = new Fpdi();
-
         $pageCount = $fpdi->setSourceFile($firstPdf);
         for ($i = 1; $i <= $pageCount; $i++) {
-            $templateId = $fpdi->importPage($i);
             $fpdi->AddPage();
-            $fpdi->useTemplate($templateId);
+            $fpdi->useTemplate($fpdi->importPage($i));
         }
 
         $pageCount = $fpdi->setSourceFile($secondPdfPath);
         for ($i = 1; $i <= $pageCount; $i++) {
-            $templateId = $fpdi->importPage($i);
             $fpdi->AddPage();
-            $fpdi->useTemplate($templateId);
+            $fpdi->useTemplate($fpdi->importPage($i));
         }
 
         return $fpdi->Output('Surat_Pengajuan.pdf', 'I');
     }
-  
-    public function terimaPengajuan(Request $request, $id){
+
+    // ✅ TERIMA PENGAJUAN
+    public function terimaPengajuan(Request $request, $id)
+    {
         $pengajuan = PengajuanModel::findOrFail($id);
         $pengajuan->status = 'Diterima';
-        $pengajuan->save();
-
         $pengajuan->cetakTerima_timestamp = now();
-        $pengajuan->save();
 
-        $jumlahOrang = count($pengajuan->mahasiswas);
+        $jumlahOrang = $pengajuan->mahasiswas->count();
         $bulanRomawi = $this->bulanRomawi(now()->month);
+        $newNoSurat = PengajuanModel::max('noSuratTerima') + 1 ?? 1;
 
-        $noSuratTerima = PengajuanModel::max('noSuratTerima');
-
-        if ($noSuratTerima){
-            $newNoSuratTerima = $noSuratTerima + 1;
-        }else {
-            $newNoSuratTerima = 1;
-        }
-
-        $pengajuan->noSuratTerima = $newNoSuratTerima;
+        $pengajuan->noSuratTerima = $newNoSurat;
         $pengajuan->save();
 
-        $qrData = "Nomor Surat: {$pengajuan->noSuratTerima}\nNama Kabag: {$pengajuan->nama_kabag}\nTanggal Cetak: {$pengajuan->cetakTerima_timestamp}";
-        $result = Builder::create()
+        $qrData = "Nomor Surat: {$newNoSurat}\nNama Kabag: {$pengajuan->nama_kabag}\nTanggal Cetak: {$pengajuan->cetakTerima_timestamp}";
+        $qrCodeUri = Builder::create()
             ->writer(new PngWriter())
             ->data($qrData)
             ->encoding(new Encoding('UTF-8'))
             ->size(150)
             ->margin(10)
             ->build()->getDataUri();
-
-        $qrCodeUri = $result;
 
         $html = view('menuadmin.pdf.suratTerima', compact('pengajuan','jumlahOrang','bulanRomawi','qrCodeUri'))->render();
 
         $mpdf = new Mpdf();
-        $mpdf->WriteHTML($html); 
+        $mpdf->WriteHTML($html);
         $fileName = 'Surat_Balasan_Terima_' . $pengajuan->id . '.pdf';
-        $filePath = public_path('storage/' . $fileName);
-        $mpdf->Output($filePath,'F', ['qrCodeUri' => $qrCodeUri]);
+        $mpdf->Output(public_path('storage/' . $fileName), 'F');
 
         $pengajuan->balasanTerima = $fileName;
         $pengajuan->save();
-        
-        Mail::to($pengajuan->user->email)->send(new PengajuanDiterimaMail($pengajuan,$bulanRomawi));
 
+        Mail::to($pengajuan->user->email)->send(new PengajuanDiterimaMail($pengajuan, $bulanRomawi));
         session()->flash('message', 'Pengajuan telah diterima.');
-
         return redirect()->route('detailpengajuan', ['id' => $id]);
     }
 
-    public function lihatSuratTerima($id) {
-        $pengajuan = PengajuanModel::findOrFail($id);
-        
-        $filePath = public_path('storage/' . $pengajuan->balasanTerima);
-
-        if (!file_exists($filePath)) {
-            return abort(404, 'File tidak ditemukan');
-        }
-
-        return response()->file($filePath);
+    public function lihatSuratTerima($id)
+    {
+        $path = public_path('storage/' . PengajuanModel::findOrFail($id)->balasanTerima);
+        abort_unless(file_exists($path), 404);
+        return response()->file($path);
     }
 
-    public function tolakPengajuan(Request $request, $id) {
-        $request->validate([
-            'alasan' => 'required|string',
-        ]);
+    // ✅ TOLAK PENGAJUAN
+    public function tolakPengajuan(Request $request, $id)
+    {
+        $request->validate(['alasan' => 'required|string']);
 
         $pengajuan = PengajuanModel::findOrFail($id);
         $pengajuan->status = 'Ditolak';
         $pengajuan->alasanTolak = $request->alasan;
-        $pengajuan->save();
-
         $pengajuan->cetakTolak_timestamp = now();
-        $pengajuan->save();
 
-        $jumlahOrang = count($pengajuan->mahasiswas);
+        $jumlahOrang = $pengajuan->mahasiswas->count();
         $bulanRomawi = $this->bulanRomawi(now()->month);
+        $newNoSurat = PengajuanModel::max('noSuratTolak') + 1 ?? 1;
 
-        $noSuratTolak = PengajuanModel::max('noSuratTolak');
-
-        if ($noSuratTolak){
-            $newNoSuratTolak = $noSuratTolak + 1;
-        }else {
-            $newNoSuratTolak = 1;
-        }
-
-        $pengajuan->noSuratTolak = $newNoSuratTolak;
+        $pengajuan->noSuratTolak = $newNoSurat;
         $pengajuan->save();
 
-        $qrData = "Nomor Surat: {$pengajuan->noSuratTolak}\nNama Kabag: {$pengajuan->nama_kabag}\nTanggal Cetak: {$pengajuan->cetakTolak_timestamp}";
-        $result = Builder::create()
+        $qrData = "Nomor Surat: {$newNoSurat}\nNama Kabag: {$pengajuan->nama_kabag}\nTanggal Cetak: {$pengajuan->cetakTolak_timestamp}";
+        $qrCodeUri = Builder::create()
             ->writer(new PngWriter())
             ->data($qrData)
             ->encoding(new Encoding('UTF-8'))
@@ -225,35 +184,25 @@ class AdminController extends Controller
             ->margin(10)
             ->build()->getDataUri();
 
-        $qrCodeUri = $result;
-
         $html = view('menuadmin.pdf.suratTolak', compact('pengajuan','jumlahOrang','bulanRomawi','qrCodeUri'))->render();
 
         $mpdf = new Mpdf();
-        $mpdf->WriteHTML($html); 
+        $mpdf->WriteHTML($html);
         $fileName = 'Surat_Balasan_Tolak_' . $pengajuan->id . '.pdf';
-        $filePath = public_path('storage/' . $fileName);
-        $mpdf->Output($filePath,'F', ['qrCodeUri' => $qrCodeUri]);
+        $mpdf->Output(public_path('storage/' . $fileName), 'F');
 
         $pengajuan->balasanTolak = $fileName;
         $pengajuan->save();
-        
-        Mail::to($pengajuan->user->email)->send(new PengajuanDitolakMail($pengajuan,$bulanRomawi));
 
-        session()->flash('message', 'Pengajuan telah ditolak dengan alasan: ' . $request->alasan);
-
+        Mail::to($pengajuan->user->email)->send(new PengajuanDitolakMail($pengajuan, $bulanRomawi));
+        session()->flash('message', 'Pengajuan telah ditolak.');
         return redirect()->route('detailpengajuan', ['id' => $id]);
     }
-    
-    public function lihatSuratTolak($id) {
-        $pengajuan = PengajuanModel::findOrFail($id);
-        
-        $filePath = public_path('storage/' . $pengajuan->balasanTolak);
 
-        if (!file_exists($filePath)) {
-            return abort(404, 'File tidak ditemukan');
-        }
-
-        return response()->file($filePath);
+    public function lihatSuratTolak($id)
+    {
+        $path = public_path('storage/' . PengajuanModel::findOrFail($id)->balasanTolak);
+        abort_unless(file_exists($path), 404);
+        return response()->file($path);
     }
 }

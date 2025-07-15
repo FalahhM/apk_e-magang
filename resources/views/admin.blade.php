@@ -54,6 +54,14 @@
     </div>
 
   </div>
+
+  <div class="row">
+    <div class="col-md-3"><div class="alert alert-success">Hadir: {{ $totalHadir }}</div></div>
+    <div class="col-md-3"><div class="alert alert-warning">Izin: {{ $totalIzin }}</div></div>
+    <div class="col-md-3"><div class="alert alert-info">Sakit: {{ $totalSakit }}</div></div>
+    <div class="col-md-3"><div class="alert alert-danger">Alfa: {{ $totalAlfa }}</div></div>
+  </div>
+
 </body>
 
 @endsection

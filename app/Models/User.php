@@ -35,4 +35,11 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(ContactPerson::class, 'user_id', 'id');
     }
+
+    // Absensi.php
+    public function kampus()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
+
 }

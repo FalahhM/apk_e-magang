@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MagangController;
 use App\Http\Controllers\SesiController;
@@ -25,6 +26,15 @@ Route::middleware(['auth', 'userAkses:admin'])->group(function() {
     Route::get('/pengajuan/{id}/surat-terima', [AdminController::class, 'lihatSuratTerima'])->name('lihatSuratTerima');
     Route::post('/tolakpengajuan{id}', [AdminController::class, 'tolakPengajuan'])->name('tolakPengajuan');
     Route::get('/pengajuan/{id}/surat-tolak', [AdminController::class, 'lihatSuratTolak'])->name('lihatSuratTolak');
+    // Halaman absensi
+    Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Langkah 1
+    Route::post('/absensi/store', [AbsensiController::class, 'store'])->name('absensi.store'); // Simpan absen
+    Route::get('/absensi/rekap', [AbsensiController::class, 'rekap'])->name('absensi.rekap');
+    Route::get('/absensi/rekap/pdf/{id}', [AbsensiController::class, 'exportPDF'])->name('absensi.rekap.pdf');
+    Route::get('/absensi/rekap/export/{id}', [AbsensiController::class, 'exportPDF'])->name('absensi.export');
+    Route::get('/absensi/filter', [AbsensiController::class, 'filter'])->name('absensi.filter');
+    Route::post('/absensi/store-ajax', [AbsensiController::class, 'storeAjax'])->name('absensi.store.ajax');
+
 });
 
 // Rute untuk User Authenticated (Akses untuk Magang)
@@ -47,6 +57,5 @@ Route::get('/check-verification', function () {
 
     return response()->json(['verified' => false]);
 });
-
 
 Route::get('/email/verify/{id}/{token}', [SesiController::class, 'verifyEmail'])->name('email.verify');

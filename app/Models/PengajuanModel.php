@@ -18,6 +18,6 @@ class PengajuanModel extends Model
 
     public function mahasiswas()
     {
-        return $this->hasMany(MahasiswaModel::class,'pengajuan_id','id');
+        return $this->hasMany(MahasiswaModel::class,'pengajuan_id');
     }
 }
