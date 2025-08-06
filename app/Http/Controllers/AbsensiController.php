@@ -20,7 +20,9 @@ class AbsensiController extends Controller
         $kampusId = $request->kampus_id;
 
         // Ambil daftar kampus untuk filter dropdown
-        $listKampus = User::all();
+        $listKampus = User::where('role', 'kampus')
+        ->orderBy('name')
+        ->get();
 
         // Ambil semua mahasiswa yang punya pengajuan magang
        $mahasiswaQuery = MahasiswaModel::with('kampus', 'pengajuan')
@@ -258,10 +260,13 @@ class AbsensiController extends Controller
 
         // Hitung absensi per mahasiswa
         $data = $mahasiswaList->map(function($mhs){
+            $pengajuan = $mhs->pengajuan;
             return [
                 'nama' => $mhs->nama_mahasiswa,
                 'nim' => $mhs->nim,
                 'kampus' => $mhs->kampus->name ?? '-',
+                'mulai_tanggal' => $pengajuan->mulai_tanggal ?? null,
+                'sampai_tanggal' => $pengajuan->sampai_tanggal ?? null,
                 'hadir' => $mhs->absensis->where('status', 'hadir')->count(),
                 'izin' => $mhs->absensis->where('status', 'izin')->count(),
                 'sakit' => $mhs->absensis->where('status', 'sakit')->count(),

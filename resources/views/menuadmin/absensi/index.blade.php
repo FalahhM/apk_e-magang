@@ -55,7 +55,7 @@
             <input type="text" name="search" id="search" class="form-control" placeholder="Cari nama..." value="{{ request('search') }}">
         </div>
         <div class="col-md-4 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary">Terapkan Filter</button>
+            <button type="submit" class="btn btn-primary" style="margin-top: 2rem">Filter</button>
         </div>
     </form>
 

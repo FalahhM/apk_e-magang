@@ -24,6 +24,7 @@
           <th>Nama</th>
           <th>NIM</th>
           <th>Kampus</th>
+          <th>Periode</th>
           <th>Hadir</th>
           <th>Izin</th>
           <th>Sakit</th>
@@ -37,6 +38,10 @@
             <td>{{ $mhs['nama'] }}</td>
             <td>{{ $mhs['nim'] }}</td>
             <td>{{ $mhs['kampus'] }}</td>
+            <td>
+              {{ $mhs['mulai_tanggal'] ? \Carbon\Carbon::parse($mhs['mulai_tanggal'])->format('d/m/Y') : '-' }} -
+              {{ $mhs['sampai_tanggal'] ? \Carbon\Carbon::parse($mhs['sampai_tanggal'])->format('d/m/Y') : '-' }}
+            </td>
             <td>{{ $mhs['hadir'] }}</td>
             <td>{{ $mhs['izin'] }}</td>
             <td>{{ $mhs['sakit'] }}</td>

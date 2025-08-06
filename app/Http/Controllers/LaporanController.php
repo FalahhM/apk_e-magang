@@ -16,7 +16,20 @@ class LaporanController extends Controller
     public function index()
     {
         $pengajuanSelesai = PengajuanModel::whereDate('sampai_tanggal', '<=', now())
-            ->with(['mahasiswas', 'laporanMagang'])
+            ->whereHas('mahasiswas', function ($query) {
+                if (request('nama')) {
+                    $query->where('nama_mahasiswa', 'like', '%' . request('nama') . '%');
+                }
+                if (request('nim')) {
+                    $query->where('nim', 'like', '%' . request('nim') . '%');
+                }
+                if (request('universitas')) {
+                    $query->whereHas('user', function ($q) {
+                        $q->where('name', 'like', '%' . request('universitas') . '%');
+                    });
+                }
+            })
+            ->with(['mahasiswas.user', 'laporanMagang', 'mahasiswas.absensis'])
             ->get();
 
         $kampusList = MahasiswaModel::with('user')
@@ -74,6 +87,7 @@ class LaporanController extends Controller
     public function lihatSertifikat($id)
     {
         $laporan = LaporanMagang::findOrFail($id);
+
         $pengajuan = $laporan->pengajuan()->with('mahasiswas')->first();
         $mahasiswa = $pengajuan->mahasiswas->first();
 
@@ -100,6 +114,10 @@ class LaporanController extends Controller
             'pengembangan_diri' => $request->pengembangan_diri,
         ]);
 
+        $laporan->jumlah_edit += 1;
+
+        $laporan->save();
+
         return redirect()->back()->with('success', 'Nilai berhasil diperbarui.');
     }
 
@@ -107,6 +125,10 @@ class LaporanController extends Controller
     public function kirim($id)
     {
         $laporan = LaporanMagang::findOrFail($id);
+
+        $laporan->increment('jumlah_kirim');
+        $laporan->terakhir_kirim_at = now();
+        $laporan->save();
         
         $pengajuan = PengajuanModel::with('mahasiswas')->findOrFail($laporan->pengajuan_id);
         $mahasiswa = $pengajuan->mahasiswas->first();
@@ -130,6 +152,11 @@ class LaporanController extends Controller
         if ($mahasiswa->email) {
             Mail::to($mahasiswa->email)->send(new SertifikatMagangMail($mahasiswa->nama_mahasiswa, $path));
         }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Sertifikat berhasil dikirim.'
+        ]);
 
         return back()->with('success', 'Sertifikat berhasil dikirim ke email mahasiswa.');
     }

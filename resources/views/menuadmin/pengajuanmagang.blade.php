@@ -18,7 +18,7 @@
                 </div>
                 <div class="col-md-4 d-flex gap-2">
                     <button type="submit" class="btn btn-success"><i class="bi bi-search"></i> Filter</button>
-                    <a href="{{ route('tampilPengajuan') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-repeat"></i> Reset</a>
+                    <a href="{{ route('tampilPengajuan') }}" style="margin-left: 12px" class="btn btn-outline-secondary"><i class="bi bi-arrow-repeat"></i> Reset</a>
                 </div>
             </form>
         </div>

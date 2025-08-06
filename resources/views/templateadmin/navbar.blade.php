@@ -13,7 +13,7 @@
                  alt="Logo PTPN IV"
                  style="width: 35px; height: 35px; border-radius: 50%;">
         </div>
-        <div class="sidebar-brand-text mx-3">PTPN IV - Reg IV</div>
+        <div class="sidebar-brand-text mx-3">E-Magang</div>
     </a>
 
     <hr class="sidebar-divider my-0">
@@ -80,7 +80,7 @@
                 </button>
 
                 <!-- Topbar Title -->
-                <h5 class="ml-3 text-success font-weight-bold">E-Magang - PTPN IV Regional IV</h5>
+                <h5 class="ml-3 text-success font-weight-bold">PTPN IV Regional IV</h5>
 
                 <!-- Topbar Navbar -->
                 <ul class="navbar-nav ml-auto">

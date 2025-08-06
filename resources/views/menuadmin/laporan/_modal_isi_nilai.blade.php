@@ -9,7 +9,7 @@
         @csrf
         <input type="hidden" name="pengajuan_id" value="{{ $pengajuan->id }}">
         <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-          <p><strong>Nama:</strong> {{ $mahasiswa->nama }}</p>
+          <p><strong>Nama:</strong> {{ $mahasiswa->nama_mahasiswa }}</p>
           <p><strong>NIM:</strong> {{ $mahasiswa->nim }}</p>
           <p><strong>Universitas:</strong> {{ $mahasiswa->user->name ?? '-' }}</p>
 
@@ -36,7 +36,7 @@
           </div>
         </div>
         <div class="modal-footer py-1">
-            <button type="submit" class="btn btn-primary">Simpan & Kirim Sertifikat</button>
+            <button type="submit" class="btn btn-primary">Simpan</button>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
         </div>
 

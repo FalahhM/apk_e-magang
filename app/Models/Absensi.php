@@ -27,4 +27,8 @@ class Absensi extends Model
         return $this->belongsTo(MahasiswaModel::class, 'mahasiswa_id');
     }
 
+    public function pengajuan(){
+        return $this->hasOne(PengajuanModel::class, 'mahasiswa_id', 'id');
+    }
+
 }

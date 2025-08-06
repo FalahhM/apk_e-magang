@@ -20,6 +20,13 @@ class LaporanMagang extends Model
         'pengembangan_diri',
         'total_nilai',
         'predikat',
+        'jumlah_edit',
+        'jumlah_kirim',
+        'terakhir_kirim_at',
+    ];
+
+    protected $casts = [
+        'terakhir_kirim_at' => 'datetime',
     ];
 
     public function pengajuan()

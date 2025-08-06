@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('keahlian');
             $table->integer('teamwork');
             $table->integer('komunikasi');
-            $table->integer('teknologi'); // penggunaan teknologi informasi
+            $table->integer('teknologi'); 
             $table->integer('pengembangan_diri');
             $table->integer('total_nilai');
             $table->string('predikat');
