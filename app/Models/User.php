@@ -20,6 +20,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'role',
         'email_verification_token',
+        'email_verified_at',
     ];
 
     protected $hidden = [
@@ -39,6 +40,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function kampus()
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+    public function mahasiswa()
+    {
+        return $this->hasOne(\App\Models\MahasiswaModel::class, 'user_id', 'id');
     }
 
 }

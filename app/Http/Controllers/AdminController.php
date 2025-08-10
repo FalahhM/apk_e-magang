@@ -13,6 +13,9 @@ use Endroid\QrCode\Writer\PngWriter;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\PengajuanDiterimaMail;
 use App\Mail\PengajuanDitolakMail;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+
 
 class AdminController extends Controller
 {
@@ -139,6 +142,21 @@ class AdminController extends Controller
 
         $pengajuan->noSuratTerima = $newNoSurat;
         $pengajuan->save();
+
+        foreach ($pengajuan->mahasiswas as $mahasiswa) {
+            $cekUser = User::where('email', $mahasiswa->email)->first();
+            if(!$cekUser){
+                User::create([
+                    'name' => $mahasiswa->nama_mahasiswa,
+                    'alamat' => '-',
+                    'email' => $mahasiswa->email,
+                    'no_telp' => '-',
+                    'password' => Hash::make('123'),
+                    'role' => 'mahasiswa',
+                    'email_verified_at' => now(),
+                ]);
+            }
+        }
 
         $qrData = "Nomor Surat: {$newNoSurat}\nNama Kabag: {$pengajuan->nama_kabag}\nTanggal Cetak: {$pengajuan->cetakTerima_timestamp}";
         $qrCodeUri = Builder::create()

@@ -5,6 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MagangController;
 use App\Http\Controllers\SesiController;
 use App\Http\Controllers\LaporanController;
+use App\Http\Controllers\MahasiswaController;
 use Illuminate\Support\Facades\Route;
 
 // Rute untuk Guest (Login dan Register)
@@ -51,6 +52,15 @@ Route::middleware(['auth'])->group(function() {
     Route::post('/logout', [SesiController::class, 'logout'])->name('logout');
     Route::get('/formpengajuan', [MagangController::class, 'pengajuan'])->name('formPengajuan');
     Route::post('/storepengajuan', [MagangController::class, 'storePengajuan'])->name('storePengajuan');
+});
+
+// mahasiswa
+Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
+    Route::get('/mahasiswadashboard', [MahasiswaController::class, 'index'])->name('mahasiswadashboard');
+
+    // menu absen
+    Route::get('mahasiswa/absensi', [MahasiswaController::class, 'absensiForm'])->name('mahasiswa.absensi');
+    Route::post('mahasiswa/absensi', [MahasiswaController::class, 'absensiStore'])->name('mahasiswa.absensi.store');
 });
 
 Route::get('/check-verification', function () {

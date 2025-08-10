@@ -88,6 +88,7 @@ class AbsensiController extends Controller
         $request->validate([
             'mahasiswa_id' => 'required|exists:mahasiswas,id',
             'status' => 'required|in:Hadir,Izin,Sakit,Alfa',
+            'keterangan' => 'nullable|string|max:255',
         ]);
 
         $mahasiswa = MahasiswaModel::with('pengajuan')->find($request->mahasiswa_id);
@@ -120,7 +121,8 @@ class AbsensiController extends Controller
             'mahasiswa_id' => $request->mahasiswa_id,
             'tanggal' => $today,
             'status' => $request->status,
-            'user_id' => $mahasiswa->user_id
+            'user_id' => $mahasiswa->user_id,
+            'keterangan' => $request->keterangan
         ]);
 
         return back()->with('success', 'Absensi berhasil disimpan.');
@@ -150,6 +152,7 @@ class AbsensiController extends Controller
             'mahasiswa_id' => 'required|exists:mahasiswas,id',
             'status' => 'required|in:Hadir,Izin,Sakit,Alfa',
             'tanggal' => 'required|date',
+            'keterangan' => 'required|string|max:255',
         ]);
 
         $tanggal = Carbon::parse($request->tanggal);
@@ -191,7 +194,8 @@ class AbsensiController extends Controller
             'mahasiswa_id' => $request->mahasiswa_id,
             'tanggal' => $tanggal,
             'status' => $request->status,
-            'user_id' => $mahasiswa->user_id
+            'user_id' => $mahasiswa->user_id,
+            'keterangan' => $request->keterangan,
         ]);
 
         return response()->json(['success' => true]);

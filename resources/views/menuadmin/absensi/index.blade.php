@@ -70,6 +70,7 @@
                 <th>Asal Kampus</th>
                 <th>Jurusan</th>
                 <th>Status</th>
+                <th>Keterangan</th>
             </tr>
         </thead>
         <tbody id="sudah-absen-body">
@@ -85,6 +86,11 @@
                     <td>{{ $mhs->kampus->name ?? '-' }}</td>
                     <td>{{ $mhs->jurusan }}</td>
                     <td class="text-center">{{ $status }}</td>
+                    <td>
+                        {{ \App\Models\Absensi::where('mahasiswa_id', $mhs->id)
+                            ->whereDate('tanggal', $tanggalHariIni)
+                            ->value('keterangan') ?? '-' }}
+                    </td>
                 </tr>
             @endforeach
         </tbody>
@@ -100,6 +106,7 @@
                     <th>Asal Kampus</th>
                     <th>Jurusan</th>
                     <th>Status Kehadiran</th>
+                    <th>Keterangan</th>
                 </tr>
             </thead>
             <tbody>
@@ -116,6 +123,12 @@
                                     {{ $status }}
                                 </label>
                             @endforeach
+                        </td>
+                        <td>
+                            <input type="text"
+                                   class="form-control"
+                                   name="keterangan_{{ $mhs->id }}"
+                                   placeholder="Isi Keterangan....">
                         </td>
                     </tr>
                 @endforeach
@@ -178,6 +191,7 @@
             const mahasiswaId = this.dataset.id;
             const status = this.value;
             const tanggal = document.getElementById('tanggal').value;
+            const keterangan = document.querySelector(`input[name="keterangan_${mahasiswaId}"]`)?.value || '';
 
             fetch("{{ route('absensi.store.ajax') }}", {
                 method: "POST",
@@ -188,7 +202,8 @@
                 body: JSON.stringify({
                     mahasiswa_id: mahasiswaId,
                     status: status,
-                    tanggal: tanggal
+                    tanggal: tanggal,
+                    keterangan: keterangan
                 })
             })
             .then(async res => {

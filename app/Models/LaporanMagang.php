@@ -11,6 +11,9 @@ class LaporanMagang extends Model
 
     protected $fillable = [
         'pengajuan_id',
+        'tanggal_kegiatan',
+        'keterangan',
+        'foto_dokumentasi',
         'integritas',
         'ketepatan_waktu',
         'keahlian',
