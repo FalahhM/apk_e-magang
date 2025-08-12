@@ -159,6 +159,7 @@
                         <thead class="table-success text-center">
                             <tr>
                                 <th>Nama</th>
+                                <th>Email</th>
                                 <th>NIM</th>
                                 <th>Jurusan</th>
                                 <th>Dosen Pembimbing</th>
@@ -168,6 +169,7 @@
                             @foreach($peng->mahasiswas as $mhs)
                                 <tr>
                                     <td>{{ $mhs->nama_mahasiswa }}</td>
+                                    <td>{{ $mhs->email }}</td>
                                     <td>{{ $mhs->nim }}</td>
                                     <td>{{ $mhs->jurusan }}</td>
                                     <td>{{ $mhs->dospem }}</td>

@@ -8,6 +8,7 @@ use App\Models\Absensi;
 use App\Models\User;
 use App\Models\MahasiswaModel;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use App\Models\PengajuanModel;
 
 class AbsensiController extends Controller
@@ -239,13 +240,37 @@ class AbsensiController extends Controller
         $mahasiswa = MahasiswaModel::with('kampus')->findOrFail($id);
         $absensi = Absensi::where('mahasiswa_id', $id)->get();
 
-        $hadir = $absensi->where('status', 'Hadir')->count();
-        $izin  = $absensi->where('status', 'Izin')->count();
-        $sakit = $absensi->where('status', 'Sakit')->count();
-        $alfa  = $absensi->where('status', 'Alfa')->count();
+        $hadir = $absensi->where('status', 'hadir')->count();
+        $izin  = $absensi->where('status', 'izin')->count();
+        $sakit = $absensi->where('status', 'sakit')->count();
+        $alfa  = $absensi->where('status', 'alfa')->count();
 
         $pdf = pdf::loadView('menuadmin.absensi.pdf.rekap', compact('mahasiswa', 'hadir', 'izin', 'sakit', 'alfa'));
         return $pdf->stream('rekap_absensi_'.$mahasiswa->nama_mahasiswa.'.pdf');
+    }
+
+    public function exportALLPDF(){
+        $mahasiswaList = MahasiswaModel::with(['kampus', 'absensis'])
+            ->whereHas('pengajuan', function($q){
+                $q->where('status','Diterima');
+            })
+            ->get();
+
+        // Hitung absensi per mahasiswa
+        $data = $mahasiswaList->map(function($mhs){
+            return [
+                'nama' => $mhs->nama_mahasiswa,
+                'nim' => $mhs->nim,
+                'kampus' => $mhs->kampus->name ?? '-',
+                'hadir' => $mhs->absensis->where('status', 'hadir')->count(),
+                'izin' => $mhs->absensis->where('status', 'izin')->count(),
+                'sakit' => $mhs->absensis->where('status', 'sakit')->count(),
+                'alfa' => $mhs->absensis->where('status', 'alfa')->count(),
+            ];
+        });
+
+        $pdf = PDF::loadView('menuadmin.absensi.pdf.rekap_all', ['data' => $data]);
+        return $pdf->stream('rekap_semua_mahasiswa.pdf');
     }
 
 

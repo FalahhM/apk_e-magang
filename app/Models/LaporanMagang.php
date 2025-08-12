@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class LaporanMagang extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'pengajuan_id',
+        'integritas',
+        'ketepatan_waktu',
+        'keahlian',
+        'teamwork',
+        'komunikasi',
+        'teknologi',
+        'pengembangan_diri',
+        'total_nilai',
+        'predikat',
+    ];
+
+    public function pengajuan()
+    {
+        return $this->belongsTo(PengajuanModel::class, 'pengajuan_id');
+    }
+
+    public function mahasiswas()
+    {
+        return $this->belongsTo(MahasiswaModel::class, 'mahasiswa_id');
+    }
+
+}

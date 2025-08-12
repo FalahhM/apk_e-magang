@@ -4,6 +4,7 @@ use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\MagangController;
 use App\Http\Controllers\SesiController;
+use App\Http\Controllers\LaporanController;
 use Illuminate\Support\Facades\Route;
 
 // Rute untuk Guest (Login dan Register)
@@ -34,7 +35,13 @@ Route::middleware(['auth', 'userAkses:admin'])->group(function() {
     Route::get('/absensi/rekap/export/{id}', [AbsensiController::class, 'exportPDF'])->name('absensi.export');
     Route::get('/absensi/filter', [AbsensiController::class, 'filter'])->name('absensi.filter');
     Route::post('/absensi/store-ajax', [AbsensiController::class, 'storeAjax'])->name('absensi.store.ajax');
-
+    Route::get('/absensi/export-all-pdf', [AbsensiController::class, 'exportALLPDF'])->name('absensi.exportALLPDF');
+    // halaman laporan
+    Route::get('/laporan', [LaporanController::class, 'index'])->name('laporan.index');
+    Route::post('/laporan/store', [LaporanController::class, 'store'])->name('laporan.store');
+    Route::get('/laporan/sertifikat/{id}', [LaporanController::class, 'lihatSertifikat'])->name('laporan.lihat');
+    Route::post('/laporan/update/{id}', [LaporanController::class, 'update'])->name('laporan.update');
+    Route::post('/laporan/kirim/{id}', [LaporanController::class, 'kirim'])->name('laporan.kirim');
 });
 
 // Rute untuk User Authenticated (Akses untuk Magang)

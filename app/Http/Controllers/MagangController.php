@@ -75,9 +75,11 @@ class MagangController extends Controller
                 MahasiswaModel::create([
                     'pengajuan_id' => $pengajuan->id,
                     'nama_mahasiswa' => $mahasiswa['nama'],
+                    'email' => $mahasiswa['email'] ?? null,
                     'nim' => $mahasiswa['nim'],
                     'jurusan' => $mahasiswa['jurusan'],
                     'dospem' => $mahasiswa['dospem'],
+                    'user_id' => Auth::id()
                 ]);
             }
         }

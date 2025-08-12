@@ -96,6 +96,7 @@
                                 <tr>
                                     <th>No</th>
                                     <th>Nama</th>
+                                    <th>Email</th>
                                     <th>NIM</th>
                                     <th>Jurusan</th>
                                     <th>Dosen Pembimbing</th>
@@ -137,6 +138,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" class="form-control" id="email" placeholder="Email Mahasiswa" required>
+                    </div>
+
+                    <div class="form-group">
                         <label for="nim">NIM</label>
                         <input type="text" class="form-control" id="nim" placeholder="NIM Mahasiswa" required>
                     </div>
@@ -165,17 +171,18 @@
 
     document.getElementById('simpanMahasiswa').addEventListener('click', function () {
         const nama = document.getElementById('nama').value;
+        const email = document.getElementById('email').value;
         const nim = document.getElementById('nim').value;
         const jurusan = document.getElementById('jurusan').value;
         const dospem = document.getElementById('dospem').value;
         const index = document.getElementById('indexMahasiswa').value;
 
-        if (!nama || !nim || !jurusan || !dospem) {
+        if (!nama || !email || !nim || !jurusan || !dospem) {
             alert('Semua field harus diisi.');
             return;
         }
 
-        const mahasiswa = { nama, nim, jurusan, dospem };
+        const mahasiswa = { nama, email, nim, jurusan, dospem };
 
         if (index === '') {
             mahasiswaList.push(mahasiswa);
@@ -196,6 +203,7 @@
                 <tr>
                     <td>${index + 1}</td>
                     <td>${mhs.nama}</td>
+                    <td>${mhs.email}</td>
                     <td>${mhs.nim}</td>
                     <td>${mhs.jurusan}</td>
                     <td>${mhs.dospem}</td>
@@ -213,6 +221,7 @@
     function editMahasiswa(index) {
         const m = mahasiswaList[index];
         document.getElementById('nama').value = m.nama;
+        document.getElementById('email').value = m.email;
         document.getElementById('nim').value = m.nim;
         document.getElementById('jurusan').value = m.jurusan;
         document.getElementById('dospem').value = m.dospem;
@@ -232,6 +241,7 @@
         document.getElementById('indexMahasiswa').value = '';
     }
 </script>
+
 
 <script>
     document.getElementById('dokumen').addEventListener('change', function (event) {

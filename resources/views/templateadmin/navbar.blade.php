@@ -47,6 +47,15 @@
         </a>
     </li>
 
+    <!-- Laporan Magang -->
+    <li class="nav-item {{ request()->is('laporan') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ url('/laporan') }}">
+            <i class="fas fa-file-alt"></i>
+            <span>Laporan Magang</span>
+        </a>
+    </li>
+
+
     <hr class="sidebar-divider d-none d-md-block">
 
     <!-- Sidebar Toggler -->

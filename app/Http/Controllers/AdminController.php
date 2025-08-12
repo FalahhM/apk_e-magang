@@ -44,9 +44,22 @@ class AdminController extends Controller
     }
 
     // ✅ TAMPIL PENGAJUAN
-    public function tampilPengajuan()
+    public function tampilPengajuan(Request $request)
     {
-        $data_pengajuan = PengajuanModel::with('user')->get();
+        $query = PengajuanModel::with('user');
+
+        if ($request->filled('no_surat')) {
+            $query->where('no_surat', 'like', '%' . $request->no_surat . '%');
+        }
+
+        if ($request->filled('nama_kampus')) {
+            $query->whereHas('user', function ($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->nama_kampus . '%');
+            });
+        }
+
+        $data_pengajuan = $query->get();
+
         return view('menuadmin.pengajuanmagang', compact('data_pengajuan'));
     }
 

@@ -39,6 +39,13 @@
         <div class="col-md-2 d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100">Filter</button>
         </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <a href="{{ route('absensi.exportALLPDF', request()->query()) }}" class="btn btn-outline-success w-100 shadow-sm fw-semibold">
+                <i class="bi bi-file-earmark-pdf-fill me-1"></i> Rekap PDF Semua Mahasiswa
+            </a>
+        </div>
+
     </form>
     
     @forelse($absensiData as $mhsId => $absens)
