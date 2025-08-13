@@ -14,7 +14,7 @@ class MahasiswaModel extends Model
         'email',
         'nim',
         'jurusan',
-        'dospem',
+        'dospem_id',
         'pengajuan_id',
         'user_id'
     ];
@@ -38,7 +38,12 @@ class MahasiswaModel extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id'); // cek nama foreign key dan modelnya
+        return $this->belongsTo(User::class, 'user_id'); 
+    }
+
+    public function dospem()
+    {
+        return $this->belongsTo(Dospem::class, 'dospem_id');
     }
 
 

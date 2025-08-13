@@ -1,6 +1,6 @@
-@extends('templatemahasiswa.header')
+@extends('templatedospem.header')
 
-@section('title', 'Dashboad Mahasiswa')
+@section('title', 'Dashboad Dospem')
 
 @section('content')
 

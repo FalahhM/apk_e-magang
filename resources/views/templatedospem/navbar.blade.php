@@ -7,7 +7,7 @@
 <ul class="navbar-nav bg-success sidebar sidebar-dark accordion" id="accordionSidebar">
 
     <!-- Sidebar - Brand -->
-    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('/mahasiswadashboard') }}">
+    <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ url('/dospemdashboard') }}">
         <div class="sidebar-brand-icon">
             <img src="https://yt3.googleusercontent.com/ytc/AIdro_nmJ8vS3qrBIAo-Vf48vC4M-dL8TrT8rSjWtBWCJV9Y8zE=s900-c-k-c0x00ffffff-no-rj"
                  alt="Logo PTPN IV"
@@ -19,8 +19,8 @@
     <hr class="sidebar-divider my-0">
 
     <!-- Dashboard -->
-    <li class="nav-item {{ request()->is('mahasiswadashboard') ? 'active' : '' }}">
-        <a class="nav-link" href="{{ url('/mahasiswadashboard') }}">
+    <li class="nav-item {{ request()->is('dospemdashboard') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ url('/dospemdashboard') }}">
             <i class="fas fa-tachometer-alt"></i>
             <span>Dashboard</span>
         </a>
@@ -31,20 +31,14 @@
     <!-- Heading -->
     <div class="sidebar-heading">Menu</div>
 
-    {{-- absensi --}}
-    <li class="nav-item {{  request()->is('mahasiswa/absensi') ? 'active' : ''}}">
-        <a href="{{ url('mahasiswa/absensi') }}" class="nav-link">
-        <i class="fas fa-user-check"></i>
-        <span>Absensi</span>
-    </a>
-    </li>
-
-    <li class="nav-item {{ request()->is('mahasiswa/laporan') ? 'active': '' }}">
-        <a href="{{ url('/mahasiswa/laporan') }}" class="nav-link">
-            <i class="fas fa-file-alt"></i>
-            <span>Laporan Kegiatan Magang</span>
+    <!-- Data Absensi -->
+    <li class="nav-item {{ request()->routeIs('dospem.absensi') || request()->routeIs('dospem.absensi.detail') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('dospem.absensi') }}">
+            <i class="fas fa-file-signature"></i>
+            <span>Data Absensi</span>
         </a>
     </li>
+
 
     <hr class="sidebar-divider d-none d-md-block">
 
@@ -80,7 +74,7 @@
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle text-success" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline font-weight-bold">
-                                {{ auth()->user()->name ?? 'Mahasiswa' }}
+                                {{ auth()->user()->name ?? 'Dospem' }}
                             </span>
                             <i class="fas fa-user-circle fa-lg"></i>
                         </a>

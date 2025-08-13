@@ -109,19 +109,19 @@
                     <div class="row g-3 mb-4 justify-content-center">
                         <div class="col-6 col-md-3">
                             <label class="status-option bg-hadir w-100">
-                                <input type="checkbox" name="status" value="hadir" required>
+                                <input type="radio" name="status" value="hadir" required>
                                 ✅ Hadir
                             </label>
                         </div>
                         <div class="col-6 col-md-3">
                             <label class="status-option bg-sakit w-100">
-                                <input type="checkbox" name="status" value="sakit">
+                                <input type="radio" name="status" value="sakit">
                                 🤒 Sakit
                             </label>
                         </div>
                         <div class="col-6 col-md-3">
                             <label class="status-option bg-izin w-100">
-                                <input type="checkbox" name="status" value="izin">
+                                <input type="radio" name="status" value="izin">
                                 📝 Izin
                             </label>
                         </div>
@@ -177,7 +177,7 @@
 {{-- Tabel Riwayat Absensi --}}
 <div class="card mt-3 mb-4 shadow-sm border-0">
     <div class="card-header text-white fw-bold"
-        style="background: linear-gradient(135deg, #007bff, #00aaff);">
+        style="background: linear-gradient(135deg, #28a745, #34d058);">
         📜 Riwayat Absensi Kamu
     </div>
     <div class="card-body p-0">
@@ -237,19 +237,14 @@
 {{-- Script agar hanya satu checkbox bisa dipilih & efek selected --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const checkboxes = document.querySelectorAll('input[name="status"]');
+    const radios = document.querySelectorAll('input[name="status"]');
     const labels = document.querySelectorAll('.status-option');
 
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', function() {
+    radios.forEach(rb => {
+        rb.addEventListener('change', function() {
+            labels.forEach(lbl => lbl.classList.remove('selected'));
             if (this.checked) {
-                checkboxes.forEach(other => {
-                    if (other !== this) other.checked = false;
-                });
-                labels.forEach(lbl => lbl.classList.remove('selected'));
                 this.closest('label').classList.add('selected');
-            } else {
-                this.closest('label').classList.remove('selected');
             }
         });
     });

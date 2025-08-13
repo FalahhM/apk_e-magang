@@ -47,4 +47,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(\App\Models\MahasiswaModel::class, 'user_id', 'id');
     }
 
+    public function dospem()
+    {
+        return $this->hasOne(Dospem::class, 'user_id', 'id');
+    }
+
+
 }

@@ -100,6 +100,7 @@
                                     <th>NIM</th>
                                     <th>Jurusan</th>
                                     <th>Dosen Pembimbing</th>
+                                    <th>Email Dosen Pembimbing</th>
                                     <th>Aksi</th>
                                 </tr>
                             </thead>
@@ -156,6 +157,11 @@
                         <label for="dospem">Dosen Pembimbing</label>
                         <input type="text" class="form-control" id="dospem" placeholder="Dosen Pembimbing" required>
                     </div>
+
+                    <div class="form-group">
+                        <label for="email_dospem">Email Dosen Pembimbing</label>
+                        <input type="text" class="form-control" id="email_dospem" placeholder="Email Dosen Pembimbing" required>
+                    </div>
                 </form>
             </div>
             <div class="modal-footer">
@@ -170,64 +176,76 @@
     let mahasiswaList = [];
 
     document.getElementById('simpanMahasiswa').addEventListener('click', function () {
-        const nama = document.getElementById('nama').value;
-        const email = document.getElementById('email').value;
-        const nim = document.getElementById('nim').value;
-        const jurusan = document.getElementById('jurusan').value;
-        const dospem = document.getElementById('dospem').value;
-        const index = document.getElementById('indexMahasiswa').value;
+    const nama = document.getElementById('nama').value;
+    const email = document.getElementById('email').value;
+    const nim = document.getElementById('nim').value;
+    const jurusan = document.getElementById('jurusan').value;
+    const dospem_nama = document.getElementById('dospem').value; // ubah ke dospem_nama
+    const dospem_email = document.getElementById('email_dospem').value; // ubah ke dospem_email
+    const index = document.getElementById('indexMahasiswa').value;
 
-        if (!nama || !email || !nim || !jurusan || !dospem) {
-            alert('Semua field harus diisi.');
-            return;
-        }
+    if (!nama || !email || !nim || !jurusan) {
+        alert('Nama, Email, NIM, dan Jurusan wajib diisi.');
+        return;
+    }
 
-        const mahasiswa = { nama, email, nim, jurusan, dospem };
+    // Dospem boleh kosong
+    const mahasiswa = { 
+        nama, 
+        email, 
+        nim, 
+        jurusan, 
+        dospem_nama, 
+        dospem_email 
+    };
 
-        if (index === '') {
-            mahasiswaList.push(mahasiswa);
-        } else {
-            mahasiswaList[index] = mahasiswa;
-        }
+    if (index === '') {
+        mahasiswaList.push(mahasiswa);
+    } else {
+        mahasiswaList[index] = mahasiswa;
+    }
 
-        renderMahasiswaTable();
-        resetForm();
-        $('#mahasiswaModal').modal('hide');
+    renderMahasiswaTable();
+    resetForm();
+    $('#mahasiswaModal').modal('hide');
+});
+
+function renderMahasiswaTable() {
+    const tbody = document.getElementById('mahasiswaTable');
+    tbody.innerHTML = '';
+    mahasiswaList.forEach((mhs, index) => {
+        tbody.innerHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${mhs.nama}</td>
+                <td>${mhs.email}</td>
+                <td>${mhs.nim}</td>
+                <td>${mhs.jurusan}</td>
+                <td>${mhs.dospem_nama || '-'}</td>
+                <td>${mhs.dospem_email || '-'}</td>
+                <td>
+                    <button type="button" class="btn btn-warning btn-sm" onclick="editMahasiswa(${index})">Edit</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="hapusMahasiswa(${index})">Hapus</button>
+                </td>
+            </tr>
+        `;
     });
 
-    function renderMahasiswaTable() {
-        const tbody = document.getElementById('mahasiswaTable');
-        tbody.innerHTML = '';
-        mahasiswaList.forEach((mhs, index) => {
-            tbody.innerHTML += `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${mhs.nama}</td>
-                    <td>${mhs.email}</td>
-                    <td>${mhs.nim}</td>
-                    <td>${mhs.jurusan}</td>
-                    <td>${mhs.dospem}</td>
-                    <td>
-                        <button type="button" class="btn btn-warning btn-sm" onclick="editMahasiswa(${index})">Edit</button>
-                        <button type="button" class="btn btn-danger btn-sm" onclick="hapusMahasiswa(${index})">Hapus</button>
-                    </td>
-                </tr>
-            `;
-        });
+    document.getElementById('mahasiswa').value = JSON.stringify(mahasiswaList);
+}
 
-        document.getElementById('mahasiswa').value = JSON.stringify(mahasiswaList);
-    }
+function editMahasiswa(index) {
+    const m = mahasiswaList[index];
+    document.getElementById('nama').value = m.nama;
+    document.getElementById('email').value = m.email;
+    document.getElementById('nim').value = m.nim;
+    document.getElementById('jurusan').value = m.jurusan;
+    document.getElementById('dospem').value = m.dospem_nama || '';
+    document.getElementById('email_dospem').value = m.dospem_email || '';
+    document.getElementById('indexMahasiswa').value = index;
+    $('#mahasiswaModal').modal('show');
+}
 
-    function editMahasiswa(index) {
-        const m = mahasiswaList[index];
-        document.getElementById('nama').value = m.nama;
-        document.getElementById('email').value = m.email;
-        document.getElementById('nim').value = m.nim;
-        document.getElementById('jurusan').value = m.jurusan;
-        document.getElementById('dospem').value = m.dospem;
-        document.getElementById('indexMahasiswa').value = index;
-        $('#mahasiswaModal').modal('show');
-    }
 
     function hapusMahasiswa(index) {
         if (confirm('Yakin ingin menghapus data mahasiswa ini?')) {

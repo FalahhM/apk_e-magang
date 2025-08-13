@@ -46,6 +46,8 @@ class SesiController extends Controller
                 return redirect('/kampusdashboard');
             } elseif (Auth::user()->role == 'mahasiswa') {
                 return redirect('/mahasiswadashboard');
+            }elseif (Auth::user()->role == 'dospem') {
+                return redirect('/dospemdashboard');
             }
         }
 

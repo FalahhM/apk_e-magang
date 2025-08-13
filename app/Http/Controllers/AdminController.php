@@ -144,17 +144,36 @@ class AdminController extends Controller
         $pengajuan->save();
 
         foreach ($pengajuan->mahasiswas as $mahasiswa) {
-            $cekUser = User::where('email', $mahasiswa->email)->first();
-            if(!$cekUser){
-                User::create([
+            if($mahasiswa->dospem && !empty($mahasiswa->dospem->email)) {
+                $cekUser = User::where('email', $mahasiswa->dospem->email)->first();
+                if(!$cekUser){
+                    User::create([
+                        'name' => $mahasiswa->dospem->nama_dospem ?? '-',
+                        'alamat' => '-', 
+                        'email' => $mahasiswa->dospem->email ?? '-',
+                        'no_telp' => '-',
+                        'password' => Hash::make('123'),
+                        'role' => 'dospem',
+                        'email_verified_at' => now(),
+                    ]);
+                }
+            }
+        }
+
+        foreach ($pengajuan->mahasiswas as $mahasiswa) {
+            $user = User::where('email', $mahasiswa->email)->first();
+            if(!$user){
+                $user = User::create([
                     'name' => $mahasiswa->nama_mahasiswa,
-                    'alamat' => '-',
+                    'alamat' => '-', 
                     'email' => $mahasiswa->email,
                     'no_telp' => '-',
                     'password' => Hash::make('123'),
                     'role' => 'mahasiswa',
                     'email_verified_at' => now(),
                 ]);
+                $mahasiswa->user_id = $user->id;
+                $mahasiswa->save();
             }
         }
 

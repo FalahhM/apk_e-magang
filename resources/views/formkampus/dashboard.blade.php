@@ -163,6 +163,7 @@
                                 <th>NIM</th>
                                 <th>Jurusan</th>
                                 <th>Dosen Pembimbing</th>
+                                <th>Email Dosen Pembimbing</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -172,7 +173,8 @@
                                     <td>{{ $mhs->email }}</td>
                                     <td>{{ $mhs->nim }}</td>
                                     <td>{{ $mhs->jurusan }}</td>
-                                    <td>{{ $mhs->dospem }}</td>
+                                    <td>{{ $mhs->dospem ? $mhs->dospem->nama_dospem : '-' }}</td>
+                                    <td>{{ $mhs->dospem ? $mhs->dospem->email : '-' }}</td>
                                 </tr>
                             @endforeach
                         </tbody>

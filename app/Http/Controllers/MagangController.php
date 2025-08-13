@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\ContactPerson;
+use App\Models\Dospem;
 use App\Models\MahasiswaModel;
 use App\Models\PengajuanModel;
 use App\Models\User;
@@ -71,15 +72,35 @@ class MagangController extends Controller
         // Simpan data mahasiswa jika ada
         if ($request->filled('mahasiswa')) {
             $mahasiswaList = json_decode($request->input('mahasiswa'), true);
+            
             foreach ($mahasiswaList as $mahasiswa) {
+
+                $dospemId = null;
+
+                // Cek apakah data dospem ada
+                if (!empty($mahasiswa['dospem_nama']) && !empty($mahasiswa['dospem_email'])) {
+                    $dospem = Dospem::firstOrCreate(
+                        [
+                            'email' => $mahasiswa['dospem_email']
+                        ],
+                        [
+                            'nama_dospem' => $mahasiswa['dospem_nama'],
+                            'email' => $mahasiswa['dospem_email']
+                        ]
+                    );
+                    $dospemId = $dospem->id;
+                } elseif (!empty($mahasiswa['dospem_id'])) {
+                    $dospemId = $mahasiswa['dospem_id'];
+                }
+
                 MahasiswaModel::create([
                     'pengajuan_id' => $pengajuan->id,
                     'nama_mahasiswa' => $mahasiswa['nama'],
                     'email' => $mahasiswa['email'] ?? null,
                     'nim' => $mahasiswa['nim'],
                     'jurusan' => $mahasiswa['jurusan'],
-                    'dospem' => $mahasiswa['dospem'],
-                    'user_id' => Auth::id()
+                    'dospem_id' => $dospemId,
+                    'user_id' => null
                 ]);
             }
         }

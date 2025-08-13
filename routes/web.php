@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AbsensiController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DospemController;
 use App\Http\Controllers\MagangController;
 use App\Http\Controllers\SesiController;
 use App\Http\Controllers\LaporanController;
@@ -58,9 +59,44 @@ Route::middleware(['auth'])->group(function() {
 Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Route::get('/mahasiswadashboard', [MahasiswaController::class, 'index'])->name('mahasiswadashboard');
 
+
     // menu absen
     Route::get('mahasiswa/absensi', [MahasiswaController::class, 'absensiForm'])->name('mahasiswa.absensi');
     Route::post('mahasiswa/absensi', [MahasiswaController::class, 'absensiStore'])->name('mahasiswa.absensi.store');
+
+
+    // menu laporan kegiatan magang
+    Route::get('mahasiswa/laporan', [MahasiswaController::class, 'laporanIndex'])->name('mahasiswa.laporan.index');
+    Route::get('mahasiswa/laporan/create', [MahasiswaController::class, 'laporanCreate'])->name('mahasiswa.laporan.create');
+    Route::post('mahasiswa/laporan/store', [MahasiswaController::class, 'laporanStore'])->name('mahasiswa.laporan.store');
+
+    Route::post('/mahasiswa/laporan/pembimbing', [MahasiswaController::class, 'simpanPembimbing'])->name('mahasiswa.laporan.simpanPembimbing');
+
+
+    // Cetak semua laporan mahasiswa
+    // web.php
+    Route::get('/mahasiswa/laporan/cetak-semua', [MahasiswaController::class, 'laporanCetakSemua'])
+        ->name('mahasiswa.laporan.cetakSemua')
+        ->middleware(['auth', 'role:mahasiswa']);
+
+
+    Route::get('mahasiswa/laporan/{id}/upload', [MahasiswaController::class, 'laporanUploadForm'])->name('mahasiswa.laporan.uploadForm');
+    Route::post('mahasiswa/laporan/{id}/upload', [MahasiswaController::class, 'laporanUploadStore'])->name('mahasiswa.laporan.uploadStore');
+
+    // Edit
+    Route::get('/mahasiswa/laporan/{id}/edit', [MahasiswaController::class, 'laporanEdit'])->name('mahasiswa.laporan.edit');
+    Route::put('/mahasiswa/laporan/{id}', [MahasiswaController::class, 'laporanUpdate'])->name('mahasiswa.laporan.update');
+
+    // Hapus
+    Route::delete('/mahasiswa/laporan/{id}', [MahasiswaController::class, 'laporanDestroy'])->name('mahasiswa.laporan.destroy');
+});
+
+// dospem
+Route::middleware(['auth', 'role:dospem'])->group(function () {
+    Route::get('/dospemdashboard', [DospemController::class, 'index'])->name('dospemdashboard');
+    Route::get('/dospem/absensi', [DospemController::class, 'absensiMahasiswaBimbingan'])->name('dospem.absensi');
+    Route::get('/dospem/absensi/{id}', [DospemController::class, 'detailAbsensiMahasiswa'])->name('dospem.absensi.detail');
+
 });
 
 Route::get('/check-verification', function () {

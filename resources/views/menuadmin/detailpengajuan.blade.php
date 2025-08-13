@@ -107,6 +107,7 @@
                             <th>NIM</th>
                             <th>Jurusan</th>
                             <th>Dosen Pembimbing</th>
+                            <th>Email Dosen Pembimbing</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -117,7 +118,8 @@
                             <td>{{ $mahasiswa->email }}</td>
                             <td>{{ $mahasiswa->nim }}</td>
                             <td>{{ $mahasiswa->jurusan }}</td>
-                            <td>{{ $mahasiswa->dospem }}</td>
+                            <td>{{ $mahasiswa->dospem->nama_dospem ?? '-' }}</td>
+                            <td>{{ $mahasiswa->dospem->email ?? '-' }}</td>
                         </tr>
                         @endforeach
                     </tbody>

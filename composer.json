@@ -9,12 +9,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.0",
+        "barryvdh/laravel-dompdf": "^3.1",
         "endroid/qr-code": "^5.1",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^9.0",
         "laravel/sanctum": "^2.14",
         "laravel/tinker": "^2.7",
         "mpdf/mpdf": "^8.0",
+        "nesbot/carbon": "2.62.1",
         "setasign/fpdf": "^1.8",
         "setasign/fpdi": "^2.6"
     },

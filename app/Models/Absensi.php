@@ -31,4 +31,17 @@ class Absensi extends Model
         return $this->hasOne(PengajuanModel::class, 'mahasiswa_id', 'id');
     }
 
+    public function mahasiswaBimbingan()
+    {
+        return $this->hasOneThrough(
+            MahasiswaModel::class,
+            User::class,      
+            'id',             
+            'user_id',        
+            'mahasiswa_id',   
+            'id'              
+        );
+    }
+
+
 }
