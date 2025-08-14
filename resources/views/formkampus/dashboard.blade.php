@@ -155,30 +155,34 @@
                 <hr>
                 <h6>Data Mahasiswa</h6>
                 @if($peng->mahasiswas && $peng->mahasiswas->count())
-                    <table class="table table-sm table-bordered">
-                        <thead class="table-success text-center">
-                            <tr>
-                                <th>Nama</th>
-                                <th>Email</th>
-                                <th>NIM</th>
-                                <th>Jurusan</th>
-                                <th>Dosen Pembimbing</th>
-                                <th>Email Dosen Pembimbing</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($peng->mahasiswas as $mhs)
+                    <div class="table-responsive">
+                        <table class="table table-sm table-bordered">
+                            <thead class="table-success text-center">
                                 <tr>
-                                    <td>{{ $mhs->nama_mahasiswa }}</td>
-                                    <td>{{ $mhs->email }}</td>
-                                    <td>{{ $mhs->nim }}</td>
-                                    <td>{{ $mhs->jurusan }}</td>
-                                    <td>{{ $mhs->dospem ? $mhs->dospem->nama_dospem : '-' }}</td>
-                                    <td>{{ $mhs->dospem ? $mhs->dospem->email : '-' }}</td>
+                                    <th>Nama</th>
+                                    <th>Email</th>
+                                    <th>NIM</th>
+                                    <th>Jurusan</th>
+                                    <th>judul Penelitian</th>
+                                    <th>Dosen Pembimbing</th>
+                                    <th>Email Dosen Pembimbing</th>
                                 </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                @foreach($peng->mahasiswas as $mhs)
+                                    <tr>
+                                        <td>{{ $mhs->nama_mahasiswa }}</td>
+                                        <td>{{ $mhs->email }}</td>
+                                        <td>{{ $mhs->nim }}</td>
+                                        <td>{{ $mhs->jurusan }}</td>
+                                        <td>{{ $mhs->judul_penelitian }}</td>
+                                        <td>{{ $mhs->dospem ? $mhs->dospem->nama_dospem : '-' }}</td>
+                                        <td>{{ $mhs->dospem ? $mhs->dospem->email : '-' }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
                 @else
                     <p class="text-muted">Tidak ada data mahasiswa.</p>
                 @endif

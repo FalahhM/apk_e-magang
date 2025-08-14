@@ -85,7 +85,9 @@ class MagangController extends Controller
                         ],
                         [
                             'nama_dospem' => $mahasiswa['dospem_nama'],
-                            'email' => $mahasiswa['dospem_email']
+                            'email' => $mahasiswa['dospem_email'],
+                            'user_id'      => Auth::id(),
+                            'pengajuan_id' => $pengajuan->id
                         ]
                     );
                     $dospemId = $dospem->id;
@@ -99,6 +101,7 @@ class MagangController extends Controller
                     'email' => $mahasiswa['email'] ?? null,
                     'nim' => $mahasiswa['nim'],
                     'jurusan' => $mahasiswa['jurusan'],
+                    'judul_penelitian' => $mahasiswa['judul_penelitian'],
                     'dospem_id' => $dospemId,
                     'user_id' => null
                 ]);

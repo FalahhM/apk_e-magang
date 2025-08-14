@@ -145,9 +145,11 @@ class AdminController extends Controller
 
         foreach ($pengajuan->mahasiswas as $mahasiswa) {
             if($mahasiswa->dospem && !empty($mahasiswa->dospem->email)) {
-                $cekUser = User::where('email', $mahasiswa->dospem->email)->first();
-                if(!$cekUser){
-                    User::create([
+                
+                // Cari user dospem, kalau belum ada buat baru
+                $userDospem = User::where('email', $mahasiswa->dospem->email)->first();
+                if(!$userDospem){
+                    $userDospem = User::create([
                         'name' => $mahasiswa->dospem->nama_dospem ?? '-',
                         'alamat' => '-', 
                         'email' => $mahasiswa->dospem->email ?? '-',
@@ -157,8 +159,14 @@ class AdminController extends Controller
                         'email_verified_at' => now(),
                     ]);
                 }
+
+                // Update user_id di tabel dospems
+                $mahasiswa->dospem->user_id = $userDospem->id;
+                $mahasiswa->dospem->pengajuan_id = $pengajuan->id;
+                $mahasiswa->dospem->save();
             }
         }
+
 
         foreach ($pengajuan->mahasiswas as $mahasiswa) {
             $user = User::where('email', $mahasiswa->email)->first();

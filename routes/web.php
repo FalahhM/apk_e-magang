@@ -58,7 +58,8 @@ Route::middleware(['auth'])->group(function() {
 // mahasiswa
 Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
     Route::get('/mahasiswadashboard', [MahasiswaController::class, 'index'])->name('mahasiswadashboard');
-
+    
+    Route::get('/mahasiswa/profil', [MahasiswaController::class, 'profil'])->name('mahasiswa.profil');
 
     // menu absen
     Route::get('mahasiswa/absensi', [MahasiswaController::class, 'absensiForm'])->name('mahasiswa.absensi');
@@ -74,7 +75,6 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
 
 
     // Cetak semua laporan mahasiswa
-    // web.php
     Route::get('/mahasiswa/laporan/cetak-semua', [MahasiswaController::class, 'laporanCetakSemua'])
         ->name('mahasiswa.laporan.cetakSemua')
         ->middleware(['auth', 'role:mahasiswa']);
@@ -94,9 +94,16 @@ Route::middleware(['auth', 'role:mahasiswa'])->group(function () {
 // dospem
 Route::middleware(['auth', 'role:dospem'])->group(function () {
     Route::get('/dospemdashboard', [DospemController::class, 'index'])->name('dospemdashboard');
+
+    Route::get('/dospem/profil', [App\Http\Controllers\DospemController::class, 'profil'])->name('dospem.profil');
+    
+    // data absensi
     Route::get('/dospem/absensi', [DospemController::class, 'absensiMahasiswaBimbingan'])->name('dospem.absensi');
     Route::get('/dospem/absensi/{id}', [DospemController::class, 'detailAbsensiMahasiswa'])->name('dospem.absensi.detail');
 
+    // data laporan kegiatan
+    Route::get('/dospem/laporan', [DospemController::class, 'laporanMahasiswaBimbingan'])->name('dospem.laporan');
+    Route::get('/dospem/laporan/{id}', [DospemController::class, 'detailLaporanMahasiswa'])->name('dospem.laporan.detail');
 });
 
 Route::get('/check-verification', function () {

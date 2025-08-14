@@ -90,25 +90,26 @@
                         <button type="button" class="btn btn-primary mb-3" data-toggle="modal" data-target="#mahasiswaModal">
                             ➕ Tambah Mahasiswa
                         </button>
-
-                        <table class="table table-bordered">
-                            <thead class="table-success text-center">
-                                <tr>
-                                    <th>No</th>
-                                    <th>Nama</th>
-                                    <th>Email</th>
-                                    <th>NIM</th>
-                                    <th>Jurusan</th>
-                                    <th>Dosen Pembimbing</th>
-                                    <th>Email Dosen Pembimbing</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="mahasiswaTable">
-                                <!-- Data Mahasiswa akan ditambahkan di sini -->
-                            </tbody>
-                        </table>
-
+                        <div class="table-responsive">
+                            <table class="table table-bordered" style="white-space: nowrap">
+                                <thead class="table-success text-center">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama</th>
+                                        <th>Email</th>
+                                        <th>NIM</th>
+                                        <th>Jurusan</th>
+                                        <th>Judul Penelitian</th>
+                                        <th>Dosen Pembimbing</th>
+                                        <th>Email Dosen Pembimbing</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="mahasiswaTable">
+                                    <!-- Data Mahasiswa akan ditambahkan di sini -->
+                                </tbody>
+                            </table>
+                        </div>
                         <input type="hidden" id="mahasiswa" name="mahasiswa">
                     </div>
                 </div>
@@ -154,6 +155,11 @@
                     </div>
 
                     <div class="form-group">
+                        <label for="judul_penelitian">Judul Penelitian</label>
+                        <input type="text" class="form-control" id="judul_penelitian" placeholder="Judul Penelitian" required>
+                    </div>
+
+                    <div class="form-group">
                         <label for="dospem">Dosen Pembimbing</label>
                         <input type="text" class="form-control" id="dospem" placeholder="Dosen Pembimbing" required>
                     </div>
@@ -180,21 +186,22 @@
     const email = document.getElementById('email').value;
     const nim = document.getElementById('nim').value;
     const jurusan = document.getElementById('jurusan').value;
-    const dospem_nama = document.getElementById('dospem').value; // ubah ke dospem_nama
-    const dospem_email = document.getElementById('email_dospem').value; // ubah ke dospem_email
+    const judul_penelitian = document.getElementById('judul_penelitian').value;
+    const dospem_nama = document.getElementById('dospem').value; 
+    const dospem_email = document.getElementById('email_dospem').value; 
     const index = document.getElementById('indexMahasiswa').value;
 
-    if (!nama || !email || !nim || !jurusan) {
-        alert('Nama, Email, NIM, dan Jurusan wajib diisi.');
+    if (!nama || !email || !nim || !jurusan || !judul_penelitian || !dospem_nama || !dospem_email) {
+        alert('Nama, Email, NIM, Jurusan, Judul Penelitian, Nama Dospem, Email Dospem wajib diisi.');
         return;
     }
 
-    // Dospem boleh kosong
     const mahasiswa = { 
         nama, 
         email, 
         nim, 
         jurusan, 
+        judul_penelitian,
         dospem_nama, 
         dospem_email 
     };
@@ -221,6 +228,7 @@ function renderMahasiswaTable() {
                 <td>${mhs.email}</td>
                 <td>${mhs.nim}</td>
                 <td>${mhs.jurusan}</td>
+                <td>${mhs.judul_penelitian}</td>
                 <td>${mhs.dospem_nama || '-'}</td>
                 <td>${mhs.dospem_email || '-'}</td>
                 <td>
@@ -240,6 +248,7 @@ function editMahasiswa(index) {
     document.getElementById('email').value = m.email;
     document.getElementById('nim').value = m.nim;
     document.getElementById('jurusan').value = m.jurusan;
+    document.getElementById('judul_penelitian').value = m.judul_penelitian;
     document.getElementById('dospem').value = m.dospem_nama || '';
     document.getElementById('email_dospem').value = m.dospem_email || '';
     document.getElementById('indexMahasiswa').value = index;

@@ -76,7 +76,6 @@
                 <ul class="navbar-nav ml-auto">
                     <div class="topbar-divider d-none d-sm-block"></div>
 
-                    <!-- Logout -->
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle text-success" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline font-weight-bold">
@@ -85,6 +84,9 @@
                             <i class="fas fa-user-circle fa-lg"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="{{ route('mahasiswa.profil') }}">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i> Profil
+                            </a>
                             <form action="/logout" method="POST" class="px-3 py-2 m-0">
                                 @csrf
                                 <button class="btn btn-link text-danger p-0" type="submit" style="width: 100%; text-align: left;">

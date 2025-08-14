@@ -14,6 +14,7 @@ class MahasiswaModel extends Model
         'email',
         'nim',
         'jurusan',
+        'judul_penelitian',
         'dospem_id',
         'pengajuan_id',
         'user_id'

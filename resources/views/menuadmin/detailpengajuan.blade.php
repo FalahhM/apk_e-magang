@@ -16,11 +16,11 @@
                     </a>
                     <form action="{{ route('terimaPengajuan', ['id' => $pengajuan->id]) }}" method="POST">
                         @csrf
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-success ml-3">
                             <i class="bi bi-check-circle"></i> Terima
                         </button>
                     </form>
-                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejectModal">
+                    <button type="button" class="btn btn-danger ml-3" data-bs-toggle="modal" data-bs-target="#rejectModal">
                         <i class="bi bi-x-circle"></i> Tolak
                     </button>
                 @elseif($pengajuan->status === 'Pending')
@@ -98,34 +98,37 @@
             {{-- Data Mahasiswa --}}
             <div>
                 <h5 class="text-success">Data Mahasiswa</h5>
-                <table class="table table-bordered table-hover">
-                    <thead class="table-success">
-                        <tr>
-                            <th>No</th>
-                            <th>Nama Mahasiswa</th>
-                            <th>Email</th>
-                            <th>NIM</th>
-                            <th>Jurusan</th>
-                            <th>Dosen Pembimbing</th>
-                            <th>Email Dosen Pembimbing</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($pengajuan->mahasiswas as $index => $mahasiswa)
-                        <tr>
-                            <td>{{ $index + 1 }}</td>
-                            <td>{{ $mahasiswa->nama_mahasiswa }}</td>
-                            <td>{{ $mahasiswa->email }}</td>
-                            <td>{{ $mahasiswa->nim }}</td>
-                            <td>{{ $mahasiswa->jurusan }}</td>
-                            <td>{{ $mahasiswa->dospem->nama_dospem ?? '-' }}</td>
-                            <td>{{ $mahasiswa->dospem->email ?? '-' }}</td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                <div class="table-responsive">
+                    <table class="table table-bordered table-hover" style="white-space: nowrap">
+                        <thead class="table-success">
+                            <tr>
+                                <th>No</th>
+                                <th>Nama Mahasiswa</th>
+                                <th>Email</th>
+                                <th>NIM</th>
+                                <th>Jurusan</th>
+                                <th>Judul Penelitian</th>
+                                <th>Dosen Pembimbing</th>
+                                <th>Email Dosen Pembimbing</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($pengajuan->mahasiswas as $index => $mahasiswa)
+                            <tr>
+                                <td>{{ $index + 1 }}</td>
+                                <td>{{ $mahasiswa->nama_mahasiswa }}</td>
+                                <td>{{ $mahasiswa->email }}</td>
+                                <td>{{ $mahasiswa->nim }}</td>
+                                <td>{{ $mahasiswa->jurusan }}</td>
+                                <td>{{ $mahasiswa->judul_penelitian }}</td>
+                                <td>{{ $mahasiswa->dospem->nama_dospem ?? '-' }}</td>
+                                <td>{{ $mahasiswa->dospem->email ?? '-' }}</td>
+                            </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
-
         </div>
     </div>
 </div>

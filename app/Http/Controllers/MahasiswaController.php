@@ -18,6 +18,15 @@ class MahasiswaController extends Controller
         return view('mahasiswa.dashboard');
     }
 
+    public function profil()
+    {
+        $mahasiswa = Auth::user()->mahasiswa;
+        $mahasiswa->load('dospem');
+
+        return view('mahasiswa.profil', compact('mahasiswa'));
+    }
+
+
     // =========================
     // ABSENSI
     // =========================

@@ -39,6 +39,14 @@
         </a>
     </li>
 
+    <!-- Data Laporan -->
+    <li class="nav-item {{ request()->routeIs('dospem.laporan') || request()->routeIs('dospem.laporan.detail') ? 'active' : '' }}">
+        <a class="nav-link" href="{{ route('dospem.laporan') }}">
+            <i class="fas fa-file-signature"></i>
+            <span>Data Laporan Kegiatan</span>
+        </a>
+    </li>
+
 
     <hr class="sidebar-divider d-none d-md-block">
 
@@ -79,6 +87,14 @@
                             <i class="fas fa-user-circle fa-lg"></i>
                         </a>
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in" aria-labelledby="userDropdown">
+                            {{-- Profil --}}
+                            <a class="dropdown-item" href="{{ route('dospem.profil') }}">
+                                <i class="fas fa-user fa-sm fa-fw mr-2"></i> Profil
+                            </a>
+
+                            <div class="dropdown-divider"></div>
+
+                            {{-- Logout --}}
                             <form action="/logout" method="POST" class="px-3 py-2 m-0">
                                 @csrf
                                 <button class="btn btn-link text-danger p-0" type="submit" style="width: 100%; text-align: left;">
@@ -86,6 +102,7 @@
                                 </button>
                             </form>
                         </div>
+
                     </li>
                 </ul>
             </nav>
