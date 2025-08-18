@@ -97,11 +97,30 @@
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
 
-            @if($alreadyAbsent)
+            @php
+                $today = \Carbon\Carbon::today();
+                $periodeMulai   = (isset($pengajuan) && $pengajuan->mulai_tanggal) ? \Carbon\Carbon::parse($pengajuan->mulai_tanggal) : null;
+                $periodeSelesai = isset($pengajuan) ? \Carbon\Carbon::parse($pengajuan->sampai_tanggal) : null;
+            @endphp
+
+            @if($today->lt($periodeMulai))
+                <div class="alert alert-danger text-center fw-bold">
+                    ⏳ Periode magang belum dimulai, kamu belum bisa absen.
+                </div>
+            @elseif($today->gt($periodeSelesai))
+                <div class="alert alert-danger text-center fw-bold">
+                    ⛔ Periode magang sudah habis.
+                </div>
+            @elseif($alreadyAbsent)
                 <div class="alert alert-info text-center fw-bold">
                     ✅ Kamu sudah absen hari ini.
                 </div>
+            @elseif($today->isWeekend())
+                <div class="alert alert-warning text-center fw-bold">
+                    🚫 Hari ini libur (Sabtu/Minggu), absensi tidak tersedia.
+                </div>
             @else
+                {{-- Form Absensi --}}
                 <form action="{{ route('mahasiswa.absensi.store') }}" method="POST">
                     @csrf
 

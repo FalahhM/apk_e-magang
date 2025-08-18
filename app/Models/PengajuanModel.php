@@ -21,9 +21,13 @@ class PengajuanModel extends Model
         return $this->hasMany(MahasiswaModel::class,'pengajuan_id');
     }
 
-    public function laporanMagang()
+    public function penilaianMagang()
     {
-        return $this->hasOne(LaporanMagang::class, 'pengajuan_id');
+        return $this->hasOne(PenilaianMagang::class, 'pengajuan_id');
     }
 
+    public function laporanMagang()
+    {
+        return $this->hasOne(PenilaianMagang::class, 'pengajuan_id');
+    }
 }

@@ -92,18 +92,34 @@
 
             {{-- Tombol Aksi --}}
             <div class="d-flex justify-content-between mb-3">
-                <a href="{{ route('mahasiswa.laporan.create') }}" class="btn btn-ptpn shadow-sm">
-                    <i class="bi bi-plus-circle me-1"></i> Tambah Laporan
-                </a>
+                @if($periodeHabis)
+                    <button type="button" class="btn btn-ptpn shadow-sm" onclick="showNotifPeriode()">
+                        <i class="bi bi-plus-circle me-1"></i> Tambah Laporan
+                    </button>
+                @elseif($sudahAbsen)
+                    <a href="{{ route('mahasiswa.laporan.create') }}" class="btn btn-ptpn shadow-sm">
+                        <i class="bi bi-plus-circle me-1"></i> Tambah Laporan
+                    </a>
+                @else
+                    <button type="button" class="btn btn-ptpn shadow-sm" onclick="showNotifAbsen()">
+                        <i class="bi bi-plus-circle me-1"></i> Tambah Laporan
+                    </button>
+                @endif
+
                 <a href="{{ route('mahasiswa.laporan.cetakSemua') }}" class="btn btn-warning shadow-sm text-white">
                     <i class="bi bi-printer me-1"></i> Cetak Laporan
                 </a>
             </div>
 
-            {{-- Pesan Sukses --}}
+            {{-- Pesan Sukses / Error --}}
             @if(session('success'))
                 <div class="alert alert-success shadow-sm">
                     <i class="bi bi-check-circle me-1"></i> {{ session('success') }}
+                </div>
+            @endif
+            @if(session('error'))
+                <div class="alert alert-danger shadow-sm">
+                    <i class="bi bi-exclamation-triangle me-1"></i> {{ session('error') }}
                 </div>
             @endif
 
@@ -162,4 +178,25 @@
         </div>
     </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    function showNotifAbsen(){
+        Swal.fire({
+            icon : 'warning',
+            title : 'Isi Absen Terlebih Dahulu',
+            text : 'Anda harus mengisi absen hari ini sebelum menambah laporan.',
+            confirmButtonColor : '#0B8A28'
+        })
+    }
+
+    function showNotifPeriode(){
+        Swal.fire({
+            icon : 'info',
+            title : 'Periode Magang Selesai',
+            text : 'Anda tidak dapat menambah laporan karena periode magang sudah selesai.',
+            confirmButtonColor : '#0B8A28'
+        })
+    }
+</script>
 @endsection

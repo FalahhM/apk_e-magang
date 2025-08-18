@@ -37,6 +37,11 @@ class MahasiswaModel extends Model
         return $this->hasOne(LaporanMagang::class, 'mahasiswa_id');
     }
 
+    public function semuaLaporan()
+    {
+        return $this->hasMany(LaporanMagang::class, 'mahasiswa_id');
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id'); 
@@ -47,5 +52,9 @@ class MahasiswaModel extends Model
         return $this->belongsTo(Dospem::class, 'dospem_id');
     }
 
+    public function penilaianMagang()
+    {
+        return $this->hasOne(\App\Models\PenilaianMagang::class, 'mahasiswa_id', 'id');
+    }
 
 }

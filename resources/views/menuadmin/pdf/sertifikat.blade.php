@@ -106,11 +106,17 @@
         <div class="section center">
             <p>Telah melaksanakan :</p>
             <p>Program Magang Kerja pada PT Perkebunan Nusantara IV Regional IV</p>
+            @php
+                $mulai  = \Carbon\Carbon::parse($pengajuan->mulai_tanggal);
+                $sampai = \Carbon\Carbon::parse($pengajuan->sampai_tanggal);
+                $lama   = $mulai->diffInDays($sampai);
+            @endphp
+
             <p>
-                Selama {{ \Carbon\Carbon::parse($pengajuan->mulai_tanggal)->format('d/m/Y') }} – {{ \Carbon\Carbon::parse($pengajuan->sampai_tanggal)->format('d/m/Y') }},
+                Selama {{ $lama }} hari,
                 terhitung mulai tanggal {{ tanggalIndo($pengajuan->mulai_tanggal) }} - {{ tanggalIndo($pengajuan->sampai_tanggal) }}
             </p>
-            <p>Dengan hasil : <strong>{{ $laporan->predikat ?? '-' }}</strong></p>
+            <p>Dengan hasil : <strong>{{ $mahasiswa->penilaianMagang->predikat ?? '-' }}</strong></p>
         </div>
 
         <div class="footer">
@@ -126,7 +132,7 @@
     <div class="wrapper" style="margin-top: 30px;">
         <div class="identitas">
             <p><strong>Nama Mahasiswa :</strong> {{ $mahasiswa->nama_mahasiswa ?? '-' }}</p>
-            <p><strong>Perguruan Tinggi :</strong> {{ $mahasiswa->user->name ?? '-' }}</p>
+            <p><strong>Perguruan Tinggi :</strong> {{ $pengajuan->user->name ?? '-' }}</p>
             <p><strong>Pelaksanaan Magang :</strong> {{ tanggalIndo($pengajuan->mulai_tanggal) }} s.d {{ tanggalIndo($pengajuan->sampai_tanggal) }}</p>
         </div><br>
         <table class="nilai-tabel" style="font-size: 16px">
@@ -142,17 +148,17 @@
                 </tr>
             </thead>
             <tbody>
-                <tr><td>1</td><td>Integritas (Etika, Moral dan Kesungguhan)</td><td>{{ $laporan->integritas }}</td><td>{{ ucwords(terbilang($laporan->integritas)) }}</td></tr>
-                <tr><td>2</td><td>Ketepatan waktu dalam bekerja</td><td>{{ $laporan->ketepatan_waktu }}</td><td>{{ ucwords(terbilang($laporan->ketepatan_waktu)) }}</td></tr>
-                <tr><td>3</td><td>Keahlian berdasarkan bidang ilmu</td><td>{{ $laporan->keahlian }}</td><td>{{ ucwords(terbilang($laporan->keahlian)) }}</td></tr>
-                <tr><td>4</td><td>Kerjasama dalam tim</td><td>{{ $laporan->teamwork }}</td><td>{{ ucwords(terbilang($laporan->teamwork)) }}</td></tr>
-                <tr><td>5</td><td>Komunikasi</td><td>{{ $laporan->komunikasi }}</td><td>{{ ucwords(terbilang($laporan->komunikasi)) }}</td></tr>
-                <tr><td>6</td><td>Penggunaan teknologi informasi</td><td>{{ $laporan->teknologi }}</td><td>{{ ucwords(terbilang($laporan->teknologi)) }}</td></tr>
-                <tr><td>7</td><td>Pengembangan diri</td><td>{{ $laporan->pengembangan_diri }}</td><td>{{ ucwords(terbilang($laporan->pengembangan_diri)) }}</td></tr>
+                <tr><td>1</td><td>Integritas (Etika, Moral dan Kesungguhan)</td><td>{{ $mahasiswa->penilaianMagang->integritas }}</td><td>{{ ucwords(terbilang($mahasiswa->penilaianMagang->integritas)) }}</td></tr>
+                <tr><td>2</td><td>Ketepatan waktu dalam bekerja</td><td>{{ $mahasiswa->penilaianMagang->ketepatan_waktu }}</td><td>{{ ucwords(terbilang($mahasiswa->penilaianMagang->ketepatan_waktu)) }}</td></tr>
+                <tr><td>3</td><td>Keahlian berdasarkan bidang ilmu</td><td>{{ $mahasiswa->penilaianMagang->keahlian }}</td><td>{{ ucwords(terbilang($mahasiswa->penilaianMagang->keahlian)) }}</td></tr>
+                <tr><td>4</td><td>Kerjasama dalam tim</td><td>{{ $mahasiswa->penilaianMagang->teamwork }}</td><td>{{ ucwords(terbilang($mahasiswa->penilaianMagang->teamwork)) }}</td></tr>
+                <tr><td>5</td><td>Komunikasi</td><td>{{ $mahasiswa->penilaianMagang->komunikasi }}</td><td>{{ ucwords(terbilang($mahasiswa->penilaianMagang->komunikasi)) }}</td></tr>
+                <tr><td>6</td><td>Penggunaan teknologi informasi</td><td>{{ $mahasiswa->penilaianMagang->teknologi }}</td><td>{{ ucwords(terbilang($mahasiswa->penilaianMagang->teknologi)) }}</td></tr>
+                <tr><td>7</td><td>Pengembangan diri</td><td>{{ $mahasiswa->penilaianMagang->pengembangan_diri }}</td><td>{{ ucwords(terbilang($mahasiswa->penilaianMagang->pengembangan_diri)) }}</td></tr>
                 <tr>
                     <td colspan="2"><strong>Total nilai pembimbing Perusahaan</strong></td>
-                    <td><strong>{{ number_format($laporan->total_nilai, 2) }}</strong></td>
-                    <td><strong>{{ ucwords(terbilang(round($laporan->total_nilai))) }}</strong></td>
+                    <td><strong>{{ number_format($mahasiswa->penilaianMagang->total_nilai, 2) }}</strong></td>
+                    <td><strong>{{ ucwords(terbilang(round($mahasiswa->penilaianMagang->total_nilai))) }}</strong></td>
                 </tr>
             </tbody>
         </table>
@@ -165,7 +171,7 @@
                         <strong>Kriteria Total Nilai Pembimbing Perusahaan :</strong>
                         <div>86 - 100 : Sangat Memuaskan</div>
                         <div>71 - 85 &nbsp;&nbsp;&nbsp;: Memuaskan</div>
-                        <div>≤ 70 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Cukup Memuaskan</div>
+                        <div>70 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;: Cukup Memuaskan</div>
                     </div>
                 </td>
 
@@ -175,10 +181,10 @@
                 <!-- Kolom TTD -->
                 <td style="width: 33%; padding: 0; vertical-align: top; padding-top:10;">
                     <div style="margin: 6px 8px; font-size: 16px; text-align: center; line-height: 1.3;">
-                        <div>{{ $pengajuan->lokasi_magang ?? 'Jambi' }}, {{ tanggalIndo(now()) }}</div>
+                        <div>{{ $mahasiswa->lokasi_magang ?? 'Jambi' }}, {{ tanggalIndo(now()) }}</div>
                         <div>Kepala Bagian SDM & Sistem Manajemen</div>
                         <br><br><br>
-                        <div><strong>{{ $pengajuan->nama_kabag ?? 'Hery Kurniawan' }}</strong></div>
+                        <div><strong>{{ $mahasiswa->nama_kabag ?? 'Hery Kurniawan' }}</strong></div>
                     </div>
                 </td>
             </tr>

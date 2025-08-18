@@ -10,13 +10,56 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Barryvdh\DomPDF\Facade\Pdf;
+use PgSql\Lob;
 
 class MahasiswaController extends Controller
 {
     public function index()
     {
-        return view('mahasiswa.dashboard');
+        $mahasiswa   = Auth::user()->mahasiswa;
+        $mahasiswaId = $mahasiswa->id;
+
+        // Ambil pengajuan yang diterima
+        $pengajuan = $mahasiswa->pengajuan()
+            ->where('status', 'Diterima')
+            ->latest('mulai_tanggal') // ambil yang terbaru
+            ->first();
+
+        // Ambil periode magang dari pengajuan
+        $periodeMulai   = $pengajuan ? $pengajuan->mulai_tanggal   : null;
+        $periodeSelesai = $pengajuan ? $pengajuan->sampai_tanggal : null;
+
+        // Hitung absensi
+        $totalHadir = Absensi::where('mahasiswa_id', $mahasiswaId)
+            ->where('status', 'hadir')
+            ->count();
+
+        $totalIzin = Absensi::where('mahasiswa_id', $mahasiswaId)
+            ->where('status', 'izin')
+            ->count();
+
+        $totalSakit = Absensi::where('mahasiswa_id', $mahasiswaId)
+            ->where('status', 'sakit')
+            ->count();
+
+        // Hitung laporan
+        $totalLaporan = LaporanMagang::where('mahasiswa_id', $mahasiswaId)->count();
+
+        // Ambil nama pembimbing
+        $pembimbing = LaporanMagang::where('mahasiswa_id', $mahasiswaId)
+            ->value('nama_pembimbing_lapangan') ?? '-';
+
+        return view('mahasiswa.dashboard', compact(
+            'totalHadir',
+            'totalIzin',
+            'totalSakit',
+            'totalLaporan',
+            'pembimbing',
+            'periodeMulai',
+            'periodeSelesai'
+        ));
     }
+
 
     public function profil()
     {
@@ -35,29 +78,35 @@ class MahasiswaController extends Controller
     {
         Carbon::setLocale('id');
         $today = Carbon::today()->toDateString();
-        $mahasiswaId = Auth::user()->mahasiswa->id;
+        $mahasiswa = Auth::user()->mahasiswa;
+        $mahasiswaId = $mahasiswa->id;
 
-        // Cek apakah sudah absen hari ini
+        // Cek sudah absen hari ini
         $alreadyAbsent = Absensi::where('mahasiswa_id', $mahasiswaId)
             ->whereDate('tanggal', $today)
             ->exists();
 
+        // --- TAMBAHAN: ambil pengajuan yang Diterima untuk periode magang ---
+        $pengajuan = $mahasiswa->pengajuan()
+            ->where('status', 'Diterima')
+            ->first(); // bisa null kalau belum ada yang diterima
+
         // Query riwayat absensi
         $query = Absensi::where('mahasiswa_id', $mahasiswaId)->orderBy('tanggal', 'desc');
-
         if ($request->filled('tanggal')) {
             $query->whereDate('tanggal', $request->tanggal);
         }
-
         $riwayatAbsensi = $query->get();
 
         return view('mahasiswa.absensi', [
-            'alreadyAbsent' => $alreadyAbsent,
-            'today' => $today,
+            'alreadyAbsent'  => $alreadyAbsent,
+            'today'          => $today,
             'riwayatAbsensi' => $riwayatAbsensi,
-            'filterTanggal' => $request->tanggal
+            'filterTanggal'  => $request->tanggal,
+            'pengajuan'      => $pengajuan,   // <-- KIRIM KE VIEW
         ]);
     }
+
 
     public function absensiStore(Request $request)
     {
@@ -67,14 +116,36 @@ class MahasiswaController extends Controller
         ]);
 
         $today = Carbon::today()->toDateString();
-        $mahasiswaId = Auth::user()->mahasiswa->id;
+        $mahasiswa = Auth::user()->mahasiswa;
+        $mahasiswaId = $mahasiswa->id;
 
+        // --- CEK PERIODE MAGANG ---
+        $pengajuan = $mahasiswa->pengajuan()->where('status','Diterima')->first();
+        if (!$pengajuan) {
+            return back()->with('error', 'Kamu belum memiliki pengajuan magang yang diterima.');
+        }
+
+        // Cek jika sebelum periode mulai
+        if (Carbon::parse($today)->lt(Carbon::parse($pengajuan->mulai_tanggal))) {
+            return back()->with('error', 'Periode magang belum dimulai, kamu belum bisa absen.');
+        }
+
+        // Cek jika setelah periode selesai
+        if (Carbon::parse($today)->gt(Carbon::parse($pengajuan->sampai_tanggal))) {
+            return back()->with('error', 'Periode magang sudah habis.');
+        }
+
+        // cek weekend
+        if (Carbon::parse($today)->isWeekend()){
+            return back()->with('error', 'Absensi hanya bisa dilakukan pada hari kerja (Senin-Jumat).');
+        }
+
+        // Sudah absen?
         $alreadyAbsent = Absensi::where('mahasiswa_id', $mahasiswaId)
             ->whereDate('tanggal', $today)
             ->exists();
-
         if ($alreadyAbsent) {
-            return redirect()->back()->with('error', 'Kamu sudah absen hari ini.');
+            return back()->with('error', 'Kamu sudah absen hari ini.');
         }
 
         $keterangan = $request->keterangan;
@@ -84,7 +155,7 @@ class MahasiswaController extends Controller
 
         Absensi::create([
             'mahasiswa_id' => $mahasiswaId,
-            'user_id'      => Auth::id(), // ini boleh tetap Auth::id() karena user_id merujuk ke tabel users
+            'user_id'      => Auth::id(),
             'tanggal'      => $today,
             'status'       => $request->status,
             'keterangan'   => $keterangan
@@ -93,16 +164,36 @@ class MahasiswaController extends Controller
         return redirect()->route('mahasiswa.absensi')->with('success', 'Absensi berhasil disimpan.');
     }
 
+
+
+
     // =========================
     // LAPORAN KEGIATAN MAGANG
     // =========================
 
     public function laporanIndex()
     {
-        $mahasiswaId = Auth::user()->mahasiswa->id;
+        $mahasiswa = Auth::user()->mahasiswa;
+        $mahasiswaId = $mahasiswa->id;
+
         $laporans = LaporanMagang::where('mahasiswa_id', $mahasiswaId)->get();
-        return view('mahasiswa.laporan.index', compact('laporans'));
+
+        // cek periode magang dari relasi pengajuan yang diterima
+        $pengajuan = $mahasiswa->pengajuan()->where('status', 'Diterima')->first();
+
+        $periodeHabis = false;
+        if ($pengajuan) {
+            $periodeHabis = Carbon::today()->gt(Carbon::parse($pengajuan->sampai_tanggal));
+        }
+
+        // cek sudah absen hari ini
+        $sudahAbsen = Absensi::where('mahasiswa_id', $mahasiswaId)
+            ->whereDate('tanggal', Carbon::today())
+            ->exists();
+
+        return view('mahasiswa.laporan.index', compact('laporans', 'periodeHabis', 'sudahAbsen'));
     }
+
 
     public function simpanPembimbing(Request $request)
     {
@@ -118,6 +209,18 @@ class MahasiswaController extends Controller
 
     public function laporanCreate()
     {
+        $mahasiswaId = Auth::user()->mahasiswa->id;
+        $tanggalHariIni = Carbon::today();
+
+        $sudahAbsen = Absensi::where('mahasiswa_id', $mahasiswaId)
+            ->whereDate('tanggal', $tanggalHariIni)
+            ->exists();
+
+        if(!$sudahAbsen){
+            return redirect()->route('mahasiswa.laporan.index')
+                ->with('error', 'Isi absen hari ini terlebih dahulu sebelum menambah laporan');
+        }
+
         return view('mahasiswa.laporan.create');
     }
 

@@ -8,7 +8,7 @@
         <div class="col-md-3">
             <label for="kampus_id">Filter Kampus</label>
             <select name="kampus_id" class="form-control">
-                <option value="">Semua Kampus</option>
+                <option value="">-- Semua Kampus --</option>
                 @foreach($listKampus as $kampus)
                     <option value="{{ $kampus->id }}" {{ request('kampus_id') == $kampus->id ? 'selected' : '' }}>
                         {{ $kampus->name }}
@@ -28,6 +28,7 @@
                 @endforeach
             </select>
         </div>
+        
         <div class="col-md-3">
             <label>Dari Tanggal</label>
             <input type="date" name="start_date" class="form-control" value="{{ request('start_date') }}">
@@ -39,13 +40,11 @@
         <div class="col-md-2 d-flex align-items-end">
             <button type="submit" class="btn btn-primary w-100">Filter</button>
         </div>
-
         <div class="col-md-4 d-flex align-items-end">
             <a href="{{ route('absensi.exportALLPDF', request()->query()) }}" class="btn btn-outline-success w-100 shadow-sm fw-semibold">
                 <i class="bi bi-file-earmark-pdf-fill me-1"></i> Rekap PDF Semua Mahasiswa
             </a>
         </div>
-
     </form>
     
     @forelse($absensiData as $mhsId => $absens)
@@ -62,7 +61,7 @@
             <div class="card-body">
                 <h5>{{ $mahasiswa->nama_mahasiswa }} ({{ $mahasiswa->nim }})</h5>
                 <p class="mb-1">Jurusan: {{ $mahasiswa->jurusan }}</p>
-                <p class="mb-0">Asal Kampus: {{ $mahasiswa->kampus->name ?? '-' }}</p>
+                <p class="mb-0">Asal Kampus: {{ $mahasiswa->pengajuan->user->name ?? '-' }}</p>
                 
                 <div class="row text-center">
                     <div class="col">✅ Hadir: <strong>{{ $hadir }}</strong></div>

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\LaporanMagang;
+use App\Models\PenilaianMagang;
 use App\Models\PengajuanModel;
 use App\Models\MahasiswaModel;
 use Illuminate\Http\Request;
@@ -14,39 +14,48 @@ use App\Models\User;
 class LaporanController extends Controller
 {
     public function index()
-    {
-        $pengajuanSelesai = PengajuanModel::whereDate('sampai_tanggal', '<=', now())
-            ->whereHas('mahasiswas', function ($query) {
-                if (request('nama')) {
-                    $query->where('nama_mahasiswa', 'like', '%' . request('nama') . '%');
-                }
-                if (request('nim')) {
-                    $query->where('nim', 'like', '%' . request('nim') . '%');
-                }
-                if (request('universitas')) {
-                    $query->whereHas('user', function ($q) {
-                        $q->where('name', 'like', '%' . request('universitas') . '%');
-                    });
-                }
+    {   
+        $pengajuan = PengajuanModel::with(['user'])->get();
+        $mahasiswaList = MahasiswaModel::with(['user', 'absensis', 'penilaianMagang', 'semuaLaporan'])
+            ->when(request('nama'), function ($query) {
+                $query->where('nama_mahasiswa', 'like', '%' . request('nama') . '%');
             })
-            ->with(['mahasiswas.user', 'laporanMagang', 'mahasiswas.absensis'])
+            ->when(request('nim'), function ($query) {
+                $query->where('nim', 'like', '%' . request('nim') . '%');
+            })
+            ->when(request('universitas'), function ($query) {
+                $query->whereHas('pengajuan.user', function ($q) {
+                    $q->where('name', 'like', '%' . request('universitas') . '%');
+                });
+            })
             ->get();
 
-        $kampusList = MahasiswaModel::with('user')
+        $mahasiswaList->each(function($mahasiswa) {
+            $mahasiswa->laporanGrouped = $mahasiswa->semuaLaporan
+                ->groupBy(function($laporan) {
+                    return $laporan->tanggal_kegiatan; 
+                });
+        });
+
+        $kampusList = MahasiswaModel::with('pengajuan.user')
             ->get()
-            ->pluck('user.name')
+            ->pluck('pengajuan.user.name')
             ->unique()
             ->sort()
             ->values();
 
-        return view('menuadmin.laporan.index', compact('pengajuanSelesai', 'kampusList'));
+        return view('menuadmin.laporan.index', [
+            'pengajuanSelesai' => $mahasiswaList,
+            'kampusList' => $kampusList
+        ]);
     }
+
 
 
     public function store(Request $request)
     {
         $request->validate([
-            'pengajuan_id' => 'required|exists:pengajuans,id',
+            'mahasiswa_id' => 'required|exists:mahasiswas,id',
             'integritas' => 'required|numeric|min:0|max:100',
             'ketepatan_waktu' => 'required|numeric|min:0|max:100',
             'keahlian' => 'required|numeric|min:0|max:100',
@@ -68,8 +77,8 @@ class LaporanController extends Controller
 
         $predikat = $this->kategoriNilai($total);
 
-        $laporan = LaporanMagang::create([
-            'pengajuan_id' => $request->pengajuan_id,
+        PenilaianMagang::create([
+            'mahasiswa_id' => $request->mahasiswa_id,
             'integritas' => $request->integritas,
             'ketepatan_waktu' => $request->ketepatan_waktu,
             'keahlian' => $request->keahlian,
@@ -81,30 +90,58 @@ class LaporanController extends Controller
             'predikat' => $predikat,
         ]);
 
-        return redirect()->back()->with('success', 'Penilaian berhasil disimpan. Klik "Kirim Sertifikat" untuk mengirim ke email mahasiswa.');
+        return redirect()->back()->with('success', 'Penilaian berhasil disimpan.');
     }
+
 
     public function lihatSertifikat($id)
     {
-        $laporan = LaporanMagang::findOrFail($id);
+        $penilaian = PenilaianMagang::findOrFail($id);
+        $mahasiswa = $penilaian->mahasiswa;
+        $pengajuan = $mahasiswa->pengajuan;
 
-        $pengajuan = $laporan->pengajuan()->with('mahasiswas')->first();
-        $mahasiswa = $pengajuan->mahasiswas->first();
+        $nilaiRataRata = round($penilaian->total_nilai);
+        $kategori = $penilaian->predikat;
 
-        $nilaiRataRata = round($laporan->total_nilai);
-        $kategori = $laporan->predikat;
-
-        $pdf = Pdf::loadView('menuadmin.pdf.sertifikat', compact('laporan', 'pengajuan', 'mahasiswa', 'nilaiRataRata', 'kategori'))
+        $pdf = Pdf::loadView('menuadmin.pdf.sertifikat', compact('penilaian', 'mahasiswa', 'nilaiRataRata', 'kategori', 'pengajuan'))
             ->setPaper('a4', 'landscape');
 
         return $pdf->stream('Sertifikat_' . $mahasiswa->nama_mahasiswa . '.pdf');
     }
 
+
     public function update(Request $request, $id)
     {
-        $laporan = LaporanMagang::findOrFail($id);
+        $request->validate([
+            'integritas' => 'required|numeric|min:0|max:100',
+            'ketepatan_waktu' => 'required|numeric|min:0|max:100',
+            'keahlian' => 'required|numeric|min:0|max:100',
+            'teamwork' => 'required|numeric|min:0|max:100',
+            'komunikasi' => 'required|numeric|min:0|max:100',
+            'teknologi' => 'required|numeric|min:0|max:100',
+            'pengembangan_diri' => 'required|numeric|min:0|max:100',
+        ]);
 
-        $laporan->update([
+        $penilaian = PenilaianMagang::findOrFail($id);
+
+        if ($penilaian->jumlah_edit >= 2) {
+            return redirect()->back()->with('error', 'Nilai sudah pernah diedit 2 kali, tidak bisa diedit lagi.');
+        }
+
+        // Hitung ulang total nilai
+        $total = (
+            $request->integritas +
+            $request->ketepatan_waktu +
+            $request->keahlian +
+            $request->teamwork +
+            $request->komunikasi +
+            $request->teknologi +
+            $request->pengembangan_diri
+        ) / 7;
+
+        $predikat = $this->kategoriNilai($total);
+
+        $penilaian->update([
             'integritas' => $request->integritas,
             'ketepatan_waktu' => $request->ketepatan_waktu,
             'keahlian' => $request->keahlian,
@@ -112,31 +149,30 @@ class LaporanController extends Controller
             'komunikasi' => $request->komunikasi,
             'teknologi' => $request->teknologi,
             'pengembangan_diri' => $request->pengembangan_diri,
+            'total_nilai' => $total,
+            'predikat' => $predikat,
         ]);
 
-        $laporan->jumlah_edit += 1;
-
-        $laporan->save();
+        $penilaian->increment('jumlah_edit');
 
         return redirect()->back()->with('success', 'Nilai berhasil diperbarui.');
     }
 
-    
-    public function kirim($id)
+    public function kirimSertifikat($id)
     {
-        $laporan = LaporanMagang::findOrFail($id);
+        $penilaian = PenilaianMagang::findOrFail($id);
+        $mahasiswa = $penilaian->mahasiswa;
 
-        $laporan->increment('jumlah_kirim');
-        $laporan->terakhir_kirim_at = now();
-        $laporan->save();
-        
-        $pengajuan = PengajuanModel::with('mahasiswas')->findOrFail($laporan->pengajuan_id);
-        $mahasiswa = $pengajuan->mahasiswas->first();
+        $pengajuan = $mahasiswa->pengajuan;
 
-        $nilaiRataRata = round($laporan->total_nilai);
-        $kategori = $laporan->predikat;
+        $penilaian->increment('jumlah_kirim');
+        $penilaian->terakhir_kirim_at = now();
+        $penilaian->save();
 
-        $pdf = Pdf::loadView('menuadmin.pdf.sertifikat', compact('laporan', 'pengajuan', 'mahasiswa', 'nilaiRataRata', 'kategori'))
+        $nilaiRataRata = round($penilaian->total_nilai);
+        $kategori = $penilaian->predikat;
+
+        $pdf = Pdf::loadView('menuadmin.pdf.sertifikat', compact('penilaian', 'mahasiswa', 'nilaiRataRata', 'kategori','pengajuan'))
             ->setPaper('a4', 'landscape');
 
         $filename = 'sertifikat_' . str_replace(' ', '_', strtolower($mahasiswa->nama_mahasiswa)) . '.pdf';
@@ -150,15 +186,37 @@ class LaporanController extends Controller
         $pdf->save($path);
 
         if ($mahasiswa->email) {
-            Mail::to($mahasiswa->email)->send(new SertifikatMagangMail($mahasiswa->nama_mahasiswa, $path));
+            try {
+                Mail::to($mahasiswa->email)->send(new SertifikatMagangMail($mahasiswa->nama_mahasiswa, $path));
+                return response()->json([
+                    'status' => 'success',
+                    'message' => 'Sertifikat berhasil dikirim ke email ' . $mahasiswa->email
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Gagal mengirim email: ' . $e->getMessage()
+                ], 500);
+            }
         }
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'Sertifikat berhasil dikirim.'
+            'status' => 'warning',
+            'message' => 'Sertifikat dibuat tapi email mahasiswa tidak tersedia'
         ]);
+    }
 
-        return back()->with('success', 'Sertifikat berhasil dikirim ke email mahasiswa.');
+
+    public function destroy($id)
+    {
+        try {
+            $penilaian = PenilaianMagang::findOrFail($id);
+            $penilaian->delete();
+
+            return redirect()->back()->with('success', 'Penilaian berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus penilaian: ' . $e->getMessage());
+        }
     }
 
     private function kategoriNilai($nilai)

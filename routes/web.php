@@ -32,6 +32,8 @@ Route::middleware(['auth', 'userAkses:admin'])->group(function() {
     // Halaman absensi
     Route::get('/absensi', [AbsensiController::class, 'index'])->name('absensi.index'); // Langkah 1
     Route::post('/absensi/store', [AbsensiController::class, 'store'])->name('absensi.store'); // Simpan absen
+    Route::get('/absensi/{id}/edit', [AbsensiController::class, 'edit'])->name('absensi.edit');
+    Route::put('/absensi/{id}', [AbsensiController::class, 'update'])->name('absensi.update');
     Route::get('/absensi/rekap', [AbsensiController::class, 'rekap'])->name('absensi.rekap');
     Route::get('/absensi/rekap/pdf/{id}', [AbsensiController::class, 'exportPDF'])->name('absensi.rekap.pdf');
     Route::get('/absensi/rekap/export/{id}', [AbsensiController::class, 'exportPDF'])->name('absensi.export');
@@ -43,7 +45,7 @@ Route::middleware(['auth', 'userAkses:admin'])->group(function() {
     Route::post('/laporan/store', [LaporanController::class, 'store'])->name('laporan.store');
     Route::get('/laporan/sertifikat/{id}', [LaporanController::class, 'lihatSertifikat'])->name('laporan.lihat');
     Route::post('/laporan/update/{id}', [LaporanController::class, 'update'])->name('laporan.update');
-    Route::post('/laporan/kirim/{id}', [LaporanController::class, 'kirim'])->name('laporan.kirim');
+    Route::post('/laporan/kirim/{id}', [LaporanController::class, 'kirimSertifikat'])->name('laporan.kirim');
 });
 
 // Rute untuk User Authenticated (Akses untuk Magang)
