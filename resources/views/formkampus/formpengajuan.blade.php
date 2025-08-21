@@ -125,7 +125,7 @@
     <div class="modal-dialog">
         <div class="modal-content shadow">
             <div class="modal-header bg-success text-white">
-                <h5 class="modal-title" id="mahasiswaModalLabel">Tambah / Edit Mahasiswa</h5>
+                <h5 class="modal-title" id="mahasiswaModalLabel">Tambah Mahasiswa</h5>
                 <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>

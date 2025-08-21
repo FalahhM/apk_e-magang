@@ -42,6 +42,10 @@ class MahasiswaController extends Controller
             ->where('status', 'sakit')
             ->count();
 
+        $totalAlfa = Absensi::where('mahasiswa_id', $mahasiswaId)
+            ->where('status', 'alfa')
+            ->count();
+
         // Hitung laporan
         $totalLaporan = LaporanMagang::where('mahasiswa_id', $mahasiswaId)->count();
 
@@ -53,13 +57,13 @@ class MahasiswaController extends Controller
             'totalHadir',
             'totalIzin',
             'totalSakit',
+            'totalAlfa',
             'totalLaporan',
             'pembimbing',
             'periodeMulai',
             'periodeSelesai'
         ));
     }
-
 
     public function profil()
     {
@@ -68,7 +72,6 @@ class MahasiswaController extends Controller
 
         return view('mahasiswa.profil', compact('mahasiswa'));
     }
-
 
     // =========================
     // ABSENSI
@@ -82,14 +85,25 @@ class MahasiswaController extends Controller
         $mahasiswaId = $mahasiswa->id;
 
         // Cek sudah absen hari ini
-        $alreadyAbsent = Absensi::where('mahasiswa_id', $mahasiswaId)
+        $absensiHariIni = Absensi::where('mahasiswa_id', $mahasiswaId)
             ->whereDate('tanggal', $today)
-            ->exists();
+            ->first();
 
-        // --- TAMBAHAN: ambil pengajuan yang Diterima untuk periode magang ---
+        $alreadyAbsent = $absensiHariIni !== null;
+        $statusHariIni = $absensiHariIni ? $absensiHariIni->status : null;
+
+        // --- ambil pengajuan yang Diterima untuk periode magang ---
         $pengajuan = $mahasiswa->pengajuan()
             ->where('status', 'Diterima')
-            ->first(); // bisa null kalau belum ada yang diterima
+            ->first();
+
+        // Cek batas waktu absensi (08:00 - 10:00)
+        $now = Carbon::now();
+        $absensiMulai = Carbon::today()->setTime(8, 0, 0);  // 08:00
+        $absensiBerakhir = Carbon::today()->setTime(10, 0, 0); // 10:00
+        
+        $dalamWaktuAbsensi = $now->between($absensiMulai, $absensiBerakhir);
+        $lewatWaktuAbsensi = $now->gt($absensiBerakhir);
 
         // Query riwayat absensi
         $query = Absensi::where('mahasiswa_id', $mahasiswaId)->orderBy('tanggal', 'desc');
@@ -99,14 +113,18 @@ class MahasiswaController extends Controller
         $riwayatAbsensi = $query->get();
 
         return view('mahasiswa.absensi', [
-            'alreadyAbsent'  => $alreadyAbsent,
-            'today'          => $today,
-            'riwayatAbsensi' => $riwayatAbsensi,
-            'filterTanggal'  => $request->tanggal,
-            'pengajuan'      => $pengajuan,   // <-- KIRIM KE VIEW
+            'alreadyAbsent'        => $alreadyAbsent,
+            'statusHariIni'        => $statusHariIni,
+            'today'                => $today,
+            'riwayatAbsensi'       => $riwayatAbsensi,
+            'filterTanggal'        => $request->tanggal,
+            'pengajuan'            => $pengajuan,
+            'dalamWaktuAbsensi'    => $dalamWaktuAbsensi,
+            'lewatWaktuAbsensi'    => $lewatWaktuAbsensi,
+            'absensiMulai'         => $absensiMulai,
+            'absensiBerakhir'      => $absensiBerakhir,
         ]);
     }
-
 
     public function absensiStore(Request $request)
     {
@@ -140,6 +158,19 @@ class MahasiswaController extends Controller
             return back()->with('error', 'Absensi hanya bisa dilakukan pada hari kerja (Senin-Jumat).');
         }
 
+        // --- CEK BATAS WAKTU ABSENSI ---
+        $now = Carbon::now();
+        $absensiMulai = Carbon::today()->setTime(8, 0, 0);  // 08:00
+        $absensiBerakhir = Carbon::today()->setTime(10, 0, 0); // 10:00
+        
+        if ($now->lt($absensiMulai)) {
+            return back()->with('error', 'Waktu absensi belum dimulai. Absensi dibuka mulai jam 08:00.');
+        }
+        
+        if ($now->gt($absensiBerakhir)) {
+            return back()->with('error', 'Waktu absensi sudah berakhir. Absensi ditutup pada jam 10:00.');
+        }
+
         // Sudah absen?
         $alreadyAbsent = Absensi::where('mahasiswa_id', $mahasiswaId)
             ->whereDate('tanggal', $today)
@@ -164,8 +195,42 @@ class MahasiswaController extends Controller
         return redirect()->route('mahasiswa.absensi')->with('success', 'Absensi berhasil disimpan.');
     }
 
+    public function buatAbsensiAlfaOtomatis()
+    {
+        $today = Carbon::today();
+        
+        // Skip weekend
+        if ($today->isWeekend()) {
+            return;
+        }
 
+        // Ambil semua mahasiswa yang memiliki pengajuan diterima dan periode masih aktif
+        $mahasiswaAktif = MahasiswaModel::whereHas('pengajuan', function($query) use ($today) {
+            $query->where('status', 'Diterima')
+                  ->where('mulai_tanggal', '<=', $today)
+                  ->where('sampai_tanggal', '>=', $today);
+        })->get();
 
+        foreach ($mahasiswaAktif as $mahasiswa) {
+            // Cek apakah sudah absen hari ini
+            $sudahAbsen = Absensi::where('mahasiswa_id', $mahasiswa->id)
+                ->whereDate('tanggal', $today)
+                ->exists();
+
+            // Jika belum absen, buat absensi alfa
+            if (!$sudahAbsen) {
+                Absensi::create([
+                    'mahasiswa_id' => $mahasiswa->id,
+                    'user_id'      => $mahasiswa->user_id,
+                    'tanggal'      => $today,
+                    'status'       => 'alfa',
+                    'keterangan'   => 'Tidak mengisi absensi dalam batas waktu'
+                ]);
+            }
+        }
+
+        return response()->json(['message' => 'Absensi alfa otomatis berhasil diproses']);
+    }
 
     // =========================
     // LAPORAN KEGIATAN MAGANG
@@ -193,7 +258,6 @@ class MahasiswaController extends Controller
 
         return view('mahasiswa.laporan.index', compact('laporans', 'periodeHabis', 'sudahAbsen'));
     }
-
 
     public function simpanPembimbing(Request $request)
     {

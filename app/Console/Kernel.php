@@ -9,19 +9,19 @@ class Kernel extends ConsoleKernel
 {
     /**
      * Define the application's command schedule.
-     *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
-     * @return void
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->call(function () {
+            app(\App\Http\Controllers\MahasiswaController::class)->buatAbsensiAlfaOtomatis();
+        })->dailyAt('10:01');
+
+        // Untuk testing, bisa ganti:
+        // })->everyMinute();
     }
 
     /**
      * Register the commands for the application.
-     *
-     * @return void
      */
     protected function commands()
     {

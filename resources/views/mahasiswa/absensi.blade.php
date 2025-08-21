@@ -72,14 +72,7 @@
         @endphp
 
         <div class="card-header fw-bold text-white d-flex align-items-center justify-content-between"
-            style="
-                background: linear-gradient(135deg, #28a745, #34d058);
-                font-size: 1.1rem;
-                padding: 15px 20px;
-                border-top-left-radius: 14px;
-                border-top-right-radius: 14px;
-                box-shadow: 0 3px 8px rgba(0,0,0,0.15);
-            ">
+            style="background: linear-gradient(135deg, #28a745, #34d058);">
             <div class="d-flex align-items-center">
                 <span style="font-size: 1.5rem; margin-right: 10px;">📅</span>
                 <span>Absensi Hari Ini</span>
@@ -91,6 +84,7 @@
 
         <div class="card-body">
 
+            {{-- Notifikasi --}}
             @if(session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @elseif(session('error'))
@@ -103,7 +97,12 @@
                 $periodeSelesai = isset($pengajuan) ? \Carbon\Carbon::parse($pengajuan->sampai_tanggal) : null;
             @endphp
 
-            @if($today->lt($periodeMulai))
+            {{-- Kondisi Absensi --}}
+            @if(!$pengajuan)
+                <div class="alert alert-danger text-center fw-bold">
+                    ⚠️ Kamu belum memiliki pengajuan magang yang diterima.
+                </div>
+            @elseif($today->lt($periodeMulai))
                 <div class="alert alert-danger text-center fw-bold">
                     ⏳ Periode magang belum dimulai, kamu belum bisa absen.
                 </div>
@@ -111,13 +110,25 @@
                 <div class="alert alert-danger text-center fw-bold">
                     ⛔ Periode magang sudah habis.
                 </div>
-            @elseif($alreadyAbsent)
+            @elseif($alreadyAbsent && $statusHariIni !== 'alfa')
                 <div class="alert alert-info text-center fw-bold">
                     ✅ Kamu sudah absen hari ini.
+                </div>
+            @elseif($alreadyAbsent && $statusHariIni === 'alfa')
+                <div class="alert alert-danger text-center fw-bold">
+                    ❌ Batas waktu absensi sudah habis, kamu tercatat Alfa.
                 </div>
             @elseif($today->isWeekend())
                 <div class="alert alert-warning text-center fw-bold">
                     🚫 Hari ini libur (Sabtu/Minggu), absensi tidak tersedia.
+                </div>
+            @elseif(!$dalamWaktuAbsensi && !$lewatWaktuAbsensi)
+                <div class="alert alert-warning text-center fw-bold">
+                    🕗 Waktu absensi belum dimulai. Absensi dibuka {{ $absensiMulai->format('H:i') }}.
+                </div>
+            @elseif($lewatWaktuAbsensi)
+                <div class="alert alert-danger text-center fw-bold">
+                    ❌ Waktu absensi sudah ditutup pukul {{ $absensiBerakhir->format('H:i') }}.
                 </div>
             @else
                 {{-- Form Absensi --}}
@@ -225,10 +236,15 @@
                                     style="background: linear-gradient(135deg, #dc3545, #ff6b6b); font-size: 0.9rem;">
                                     🤒 Sakit
                                 </span>
-                            @else
+                            @elseif($absen->status == 'izin')
                                 <span class="badge rounded-pill px-3 py-2 text-dark" 
                                     style="background: linear-gradient(135deg, #ffc107, #ffdd57); font-size: 0.9rem;">
                                     📝 Izin
+                                </span>
+                            @elseif($absen->status == 'alfa')
+                                <span class="badge rounded-pill px-3 py-2 text-white" 
+                                    style="background: linear-gradient(135deg, #ff0707, #ff5757); font-size: 0.9rem;">
+                                    ❌ Alfa
                                 </span>
                             @endif
                         </td>
@@ -253,7 +269,6 @@
 </div>
 
 
-{{-- Script agar hanya satu checkbox bisa dipilih & efek selected --}}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const radios = document.querySelectorAll('input[name="status"]');
