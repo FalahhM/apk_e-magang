@@ -142,8 +142,11 @@
 
     <!-- Identitas Mahasiswa -->
     <div class="identitas">
-        <p><strong>Nama Mahasiswa:</strong> {{ $mahasiswa->nama_mahasiswa ?? '-' }}</p>
-        <p><strong>NIM:</strong> {{ $mahasiswa->nim ?? '-' }}</p>
+        <p><strong>Nama Mahasiswa : </strong> {{ $mahasiswa->nama_mahasiswa ?? '-' }}</p>
+        <p><strong>NIM : </strong> {{ $mahasiswa->nim ?? '-' }}</p>
+        <p><strong>Jurusan : </strong>{{ $mahasiswa->jurusan ?? '_' }}</p>
+        <p><strong>Dosen Pembimbing : </strong>{{ $mahasiswa->dospem->nama_dospem ?? '_' }}</p>
+        <p><strong>Pembimbing Lapangan : </strong>{{ $pembimbing->nama ?? '_' }}</p>
     </div>
 
     <!-- Tabel Kegiatan -->

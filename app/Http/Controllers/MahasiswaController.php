@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Absensi;
+use App\Models\Dospem;
 use App\Models\LaporanMagang;
 use App\Models\MahasiswaModel;
 use Illuminate\Http\Request;
@@ -325,13 +326,15 @@ class MahasiswaController extends Controller
 
         $firstLaporan = $laporans->first();
         $mahasiswa = MahasiswaModel::find($firstLaporan->mahasiswa_id);
+        $dospem = $mahasiswa->dospem;
         $pembimbingNama = $firstLaporan->nama_pembimbing_lapangan ?? '________________';
         $pembimbing = (object) ['nama' => $pembimbingNama];
 
         $pdf = Pdf::loadView('mahasiswa.laporan.cetak_semua', [
             'laporans'   => $laporans,
             'mahasiswa'  => $mahasiswa,
-            'pembimbing' => $pembimbing
+            'pembimbing' => $pembimbing,
+            'dospem'     => $dospem
         ])->setPaper('A4', 'portrait');
 
         return $pdf->stream('laporan_kegiatan_magang.pdf');

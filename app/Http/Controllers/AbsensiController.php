@@ -101,7 +101,7 @@ class AbsensiController extends Controller
         }
         $pengajuan = $mahasiswa->pengajuan;
 
-        $today = Carbon::today();
+        $today = Carbon::today()->locale('id');
 
         if($today->isWeekend()){
             return back()->with('error', 'Absensi hanya bisa dilakukan pada hari kerja (Senin-Jumat).');
