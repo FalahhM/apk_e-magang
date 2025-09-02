@@ -47,7 +47,7 @@
 <body>
     <div class="container min-vh-100 d-flex justify-content-center align-items-center">
         <div class="login-box text-center">
-            <img src="https://yt3.googleusercontent.com/ytc/AIdro_nmJ8vS3qrBIAo-Vf48vC4M-dL8TrT8rSjWtBWCJV9Y8zE=s900-c-k-c0x00ffffff-no-rj" alt="Logo PTPN IV" class="ptpn-logo mb-3">
+            <img src="https://lms.reg5palmco.com/moodle/pluginfile.php/1/theme_moove/logo/1707130331/Logo%20N4.png" alt="Logo PTPN IV" class="ptpn-logo mb-3">
             <h2 class="brand-header mb-3">E-Magang</h2>
             <h2 class="brand-header mb-3">PTPN IV Regional IV</h2>
             <p class="text-muted">Silakan login untuk melanjutkan</p>
